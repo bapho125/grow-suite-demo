@@ -385,7 +385,7 @@
 
 <!-- new post modal -->
 <div class="ov" id="ov"><div class="modal">
-  <h3>新規投稿を予約</h3>
+  <h3 id="m_title">新規投稿を予約</h3>
   <div class="mwhen" id="m_when"></div>
   <div class="f"><label>テーマ（社内管理名）</label><input id="m_theme" placeholder="例）7月キャンペーン告知"></div>
   <div class="f"><label>形式</label>
@@ -408,7 +408,7 @@
     <div class="f"><label>予約日</label><input type="date" id="m_date"></div>
     <div class="f"><label>時刻</label><input type="time" id="m_time" value="19:00"></div>
   </div>
-  <div class="mfoot"><button class="btn ghost" onclick="closeOv()">キャンセル</button><button class="btn ig" onclick="savePost()">予約に追加</button></div>
+  <div class="mfoot"><button class="btn ghost" onclick="closeOv()">キャンセル</button><button class="btn ig" id="m_save" onclick="savePost()">予約に追加</button></div>
 </div></div>
 
 <!-- add growth data modal -->
@@ -709,7 +709,8 @@ function renderDetail(){
   const whenLabel=p.posted?'投稿':'予約';
   const acts=(p.posted&&p.mt)
     ? `<div class="dmetrics"><div><b>${fmtNum(p.mt.reach)}</b><span>リーチ</span></div><div><b>${fmtNum(p.mt.views)}</b><span>視聴</span></div><div><b>${fmtNum(p.mt.saves)}</b><span>保存</span></div><div><b>${fmtNum(p.mt.sends)}</b><span>シェア</span></div></div><div class="dhint">投稿済み。この投稿の実績です。</div>`
-    : `<div class="dacts">
+    : `<button class="btn ghost sm" style="width:100%;justify-content:center;margin-bottom:11px" onclick="editPost(${p.id})">✎ 内容を編集（テーマ・キャプション・画像・形式・日時）</button>
+    <div class="dacts">
       <button class="ck ${p.ap.i?'done':''}" onclick="approve(${p.id},'i')">${p.ap.i?'✓ 社内確認済':'社内確認'}</button>
       <button class="ck ${p.ap.c?'done':''}" onclick="approve(${p.id},'c')" ${!p.ap.i?'style="opacity:.4"':''}>${p.ap.c?'✓ クライアント確認済':'クライアント確認'}</button>
     </div><div class="dhint">チェックはもう一度押すと取り消せます。</div>`;
@@ -721,6 +722,7 @@ function renderDetail(){
 }
 function selMedia(j){if(DCUR){DCUR.i=j;renderDetail();}}
 function closeOvD(){DCUR=null;document.getElementById('ovD').classList.remove('show');}
+function editPost(id){const p=store.posts.find(x=>x.id===id);if(!p)return;closeOvD();openPost(null,p);}
 
 /* ===== CLIENT GUEST APPROVAL PORTAL ===== */
 let CLIENT_PREVIEW=false;
@@ -1055,6 +1057,7 @@ function renderAbout(m){
 /* ===== modals ===== */
 /* ---- media (images + video) ---- */
 let MEDIA=[];
+let editId=null;
 function mediaThumb(p){return p.media&&p.media.length?(p.media[0].thumb||''):(p.img||'');}
 function mediaOverlay(p){
   if(!p.media||!p.media.length)return p.img?'':'';
@@ -1088,14 +1091,22 @@ function renderMediaThumbs(){
 }
 function rmMedia(i){MEDIA.splice(i,1);renderMediaThumbs();}
 
-function openPost(anchor){
-  document.getElementById('m_theme').value='';document.getElementById('m_cap').value='';
-  document.getElementById('m_date').value=TODAY;document.getElementById('m_time').value='19:00';
-  document.querySelectorAll('#m_fmt .fmtopt').forEach((o,i)=>o.classList.toggle('on',i===0));
-  document.getElementById('storyHint').style.display='none';
+function openPost(anchor,post){
+  editId=post?post.id:null;
+  document.getElementById('m_title').textContent=post?'投稿を編集':'新規投稿を予約';
+  document.getElementById('m_save').textContent=post?'更新する':'予約に追加';
+  document.getElementById('m_theme').value=post?(post.theme==='（無題の投稿）'?'':post.theme):'';
+  document.getElementById('m_cap').value=post?(post.cap||''):'';
+  if(post){const d=new Date(post.when);
+    document.getElementById('m_date').value=`${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
+    document.getElementById('m_time').value=`${('0'+d.getHours()).slice(-2)}:${('0'+d.getMinutes()).slice(-2)}`;
+  }else{document.getElementById('m_date').value=TODAY;document.getElementById('m_time').value='19:00';}
+  const curFmt=post?post.fmt:'フィード';
+  document.querySelectorAll('#m_fmt .fmtopt').forEach(o=>o.classList.toggle('on',o.dataset.v===curFmt));
+  document.getElementById('storyHint').style.display=curFmt==='ストーリー'?'block':'none';
   document.getElementById('m_when').textContent='';
   document.getElementById('recSlots').innerHTML=TOPSLOTS.map(t=>`<span class="btchip" style="cursor:pointer" onclick="applySlot(${t.di},'${BUCKETS[t.bi][1]}')">${HDAYS[t.di]} ${BUCKETS[t.bi][1]}</span>`).join('');
-  MEDIA=[];renderMediaThumbs();
+  MEDIA=post&&post.media?post.media.map(m=>({t:m.t,thumb:m.thumb,name:m.name,_url:m._url})):[];renderMediaThumbs();
   const ov=document.getElementById('ov'),modal=ov.querySelector('.modal');
   if(anchor){
     ov.classList.add('anchored');
@@ -1119,7 +1130,7 @@ function openPostOn(ds,ev){
   if(ds){document.getElementById('m_date').value=ds;
     const d=new Date(ds+'T00:00');document.getElementById('m_when').textContent=`${d.getMonth()+1}月${d.getDate()}日 に投稿を作成`;}
 }
-function closeOv(){document.getElementById('ov').classList.remove('show');}
+function closeOv(){editId=null;document.getElementById('ov').classList.remove('show');}
 document.getElementById('m_fmt').addEventListener('click',e=>{
   const o=e.target.closest('.fmtopt');if(!o)return;
   document.querySelectorAll('#m_fmt .fmtopt').forEach(x=>x.classList.toggle('on',x===o));
@@ -1130,8 +1141,15 @@ function savePost(){
   const fmt=document.querySelector('#m_fmt .fmtopt.on').dataset.v;
   const cap=document.getElementById('m_cap').value;
   const when=document.getElementById('m_date').value+'T'+document.getElementById('m_time').value;
-  const id=Math.max(0,...store.posts.map(p=>p.id))+1;
   const media=MEDIA.map(m=>({t:m.t,thumb:m.thumb,name:m.name,_url:m._url}));
+  if(editId!=null){
+    const p=store.posts.find(x=>x.id===editId);
+    if(p){p.theme=theme;p.fmt=fmt;p.cap=cap;p.when=when;p.media=media;}
+    editId=null;save();closeOv();render();
+    toast('投稿を更新しました');
+    return;
+  }
+  const id=Math.max(0,...store.posts.map(p=>p.id))+1;
   store.posts.push({id,theme,fmt,cap,when,posted:false,ap:{i:false,c:false},mt:null,img:'',media});
   save();closeOv();tab='approve';document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('on',x.dataset.t==='approve'));render();
   toast('予約に追加。社内確認→クライアント確認の承認へ進みます');
