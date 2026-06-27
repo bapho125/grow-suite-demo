@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GROW Suite ｜ Instagram運用ツール</title>
+<style>
+  :root{
+    --ig:linear-gradient(105deg,#f9ce34 0%,#ee2a7b 48%,#6228d7 100%);
+    --ig2:linear-gradient(135deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);
+    --bg:#f2f3fa;--card:#fff;--line:#e8eaf4;--text:#161b26;--muted:#838b9e;
+    --up:#15a566;--upbg:#e6f6ee;--down:#e0506b;--downbg:#fdeaef;--warn:#d98324;--warnbg:#fcf3e4;
+    --sh:0 16px 44px rgba(45,45,95,.10);--sh2:0 7px 22px rgba(45,45,95,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+  .app{display:flex;min-height:100vh}
+  /* sidebar */
+  .side{width:230px;background:#fff;box-shadow:1px 0 26px rgba(45,45,95,.045);padding:20px 14px;flex-shrink:0;position:sticky;top:0;height:100vh;z-index:5}
+  .brand{display:flex;align-items:center;gap:11px;padding:6px 8px 20px}
+  .logo{width:40px;height:40px;border-radius:12px;background:var(--ig2);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:19px;box-shadow:0 6px 16px rgba(214,41,118,.35)}
+  .brand .bt{min-width:0}
+  .brand b{font-size:16px;font-weight:800;display:block;line-height:1.2}.brand span{font-size:11px;color:var(--muted);display:block;line-height:1.3}
+  .nav{display:flex;flex-direction:column;gap:3px}
+  .nav button{display:flex;align-items:center;gap:11px;border:none;background:none;padding:11px 13px;border-radius:11px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;text-align:left;transition:.16s;font-family:inherit}
+  .nav button:hover{background:#f4f5fa;color:var(--text)}
+  .nav button.on{background:#f0effa;color:#5b2bbf}
+  .nav .ico{width:19px;text-align:center;font-size:16px}
+  .nav .badge{margin-left:auto;background:var(--ig2);color:#fff;font-size:10px;font-weight:800;border-radius:999px;padding:2px 7px}
+  .side .acc{margin-top:18px;padding:12px 13px;background:#f7f8fc;border-radius:12px;font-size:12px}
+  .side .acc b{display:block;font-size:13px;margin-bottom:2px}
+  .demo{margin-top:12px;font-size:10.5px;color:var(--muted);line-height:1.6;padding:0 8px}
+  /* main */
+  .main{flex:1;padding:26px 32px 60px;max-width:1000px}
+  .ph{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+  .ph h2{font-size:22px;font-weight:800;letter-spacing:.01em}
+  .ph .gr{flex:1}
+  .psub{font-size:13px;color:var(--muted);margin-bottom:22px}
+  .btn{cursor:pointer;border:none;border-radius:11px;padding:11px 17px;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:.18s;font-family:inherit}
+  .btn:hover{transform:translateY(-1px)}
+  .btn.ig{background:var(--ig2);color:#fff;box-shadow:0 8px 20px rgba(214,41,118,.3)}
+  .btn.ghost{background:#fff;border:1px solid var(--line);color:var(--text);box-shadow:var(--sh2)}
+  .btn.sm{padding:7px 12px;font-size:12.5px;border-radius:9px}
+  .seg{display:inline-flex;background:#eceef4;border-radius:11px;padding:4px}
+  .seg button{border:none;background:none;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:.18s;font-family:inherit}
+  .seg button.on{background:#fff;color:var(--text);box-shadow:var(--sh2)}
+  .view{animation:fade .4s}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  /* === CLIENT VIEW (guest approval portal) === */
+  .ovc{position:fixed;inset:0;background:var(--bg);z-index:60;overflow:auto;display:none}
+  .ovc.show{display:block;animation:fade .35s}
+  .cvclose{position:fixed;top:18px;right:20px;background:#fff;border:1px solid var(--line);border-radius:11px;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:var(--sh2);z-index:61}
+  .cv{max-width:580px;margin:0 auto;padding:34px 22px 70px}
+  .cvhead{text-align:center;margin-bottom:6px}
+  .cvlogo{width:54px;height:54px;border-radius:16px;background:var(--ig2);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:25px;box-shadow:0 8px 22px rgba(214,41,118,.3)}
+  .cvhead h2{font-size:22px;font-weight:800;margin-top:16px;letter-spacing:.01em}
+  .cvhead p{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.8}
+  .cvcount{display:inline-block;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 15px;font-size:12px;font-weight:800;margin:18px 0 24px;box-shadow:var(--sh2)}
+  .ccard{background:#fff;border-radius:22px;box-shadow:var(--sh);overflow:hidden;margin-bottom:22px}
+  .cimg{width:100%;aspect-ratio:1/1;background-size:cover;background-position:center;position:relative}
+  .cbody{padding:18px 20px 20px}
+  .ctheme{font-size:15.5px;font-weight:800}
+  .cmeta{font-size:12px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .ccap{font-size:13px;color:#39404f;line-height:1.85;margin-top:12px;white-space:pre-wrap}
+  .cacts{display:flex;gap:10px;margin-top:18px}
+  .cbtn{flex:1;border:none;border-radius:13px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;transition:.15s;font-family:inherit}
+  .cbtn:hover{transform:translateY(-1px)}
+  .cbtn.ok{background:var(--ig2);color:#fff;box-shadow:0 8px 18px rgba(214,41,118,.28)}
+  .cbtn.fixb{background:#fff;border:1px solid var(--line);color:var(--text)}
+  .cfix{margin-top:13px;display:none}
+  .cfix textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:13px;font-family:inherit;background:#fbfbfe;min-height:64px;resize:vertical}
+  .cfix .row{display:flex;gap:8px;margin-top:9px;justify-content:flex-end}
+  .capproved{margin-top:16px;text-align:center;font-size:13px;font-weight:800;color:var(--up);background:var(--upbg);border-radius:12px;padding:12px}
+  .cdone{text-align:center;padding:56px 20px;color:var(--muted);font-size:14px;line-height:1.8}
+  .cdone .big{font-size:42px;margin-bottom:14px}
+  @keyframes rise{to{opacity:1;transform:translateY(0)}}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @keyframes pop{to{opacity:1}}
+  /* status chips */
+  .chip{font-size:11px;font-weight:800;padding:3px 9px;border-radius:7px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+  .chip.posted{background:var(--upbg);color:var(--up)}
+  .chip.sched{background:#eef0fc;color:#5b2bbf}
+  .chip.int{background:var(--warnbg);color:var(--warn)}
+  .chip.cli{background:#e9f2fe;color:#2f7bd9}
+  .fmtb{font-size:10px;border:1px solid var(--line);border-radius:6px;padding:1px 7px;color:var(--muted);white-space:nowrap;flex-shrink:0}
+  .nw{white-space:nowrap}
+  .thumb{width:48px;height:48px;border-radius:11px;flex-shrink:0;background-size:cover;background-position:center;position:relative;overflow:hidden}
+  .mvid{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;text-shadow:0 1px 4px rgba(0,0,0,.55)}
+  .mcnt{position:absolute;top:3px;right:3px;background:rgba(20,20,30,.7);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:6px;z-index:2}
+  .mthumbs{display:flex;flex-wrap:wrap;gap:9px;margin-top:11px}
+  .mth{width:60px;height:60px;border-radius:10px;background-size:cover;background-position:center;position:relative;background-image:var(--ig2)}
+  .mth .x{position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;background:#161b26;color:#fff;font-size:13px;line-height:1;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+  .dstrip{display:flex;gap:7px;margin:12px 0 2px;flex-wrap:wrap}
+  .dthumb{width:46px;height:46px;border-radius:9px;background-size:cover;background-position:center;cursor:pointer;position:relative;border:2px solid transparent}
+  .dthumb.on{border-color:#d62976}
+  /* === CALENDAR / QUEUE === */
+  .calwrap{display:grid;grid-template-columns:1fr 320px;gap:20px}
+  .panel{background:var(--card);border-radius:20px;box-shadow:var(--sh2);padding:20px}
+  .calhead{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .calhead b{font-size:16px}
+  .calnav{margin-left:auto;display:flex;gap:6px}
+  .calnav button{border:1px solid var(--line);background:#fff;width:30px;height:30px;border-radius:9px;cursor:pointer;font-size:15px;color:var(--muted)}
+  .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+  .cal .dow{text-align:center;font-size:11px;color:var(--muted);font-weight:700;padding-bottom:4px}
+  .cell{min-height:74px;border:1px solid var(--line);border-radius:12px;padding:6px;font-size:11px;position:relative;transition:.15s;cursor:pointer}
+  .cell .add{position:absolute;top:5px;right:6px;color:#c9cedb;font-size:13px;opacity:0;transition:.15s}
+  .cell:hover .add{opacity:1}
+  .cell.pad{background:#fafbfd;border-color:#f2f4f8}
+  .cell:hover{border-color:#d9bff5}
+  .cell .dn{font-weight:700;color:var(--muted);font-size:11px}
+  .cell.today .dn{background:var(--ig2);color:#fff;border-radius:6px;padding:0 5px;display:inline-block}
+  .ev{display:flex;align-items:center;gap:5px;margin-top:4px;font-size:9.5px;border-radius:6px;padding:2px 5px 2px 2px;background:#fff;border:1px solid var(--line);border-left:3px solid var(--line);cursor:pointer;overflow:hidden;transition:.13s}
+  .ev:hover{transform:translateX(1px);box-shadow:0 2px 7px rgba(45,45,95,.1)}
+  .ev .evth{width:18px;height:18px;border-radius:4px;background-size:cover;background-position:center;flex-shrink:0}
+  .ev .evtx{color:var(--text);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .ev.posted{border-left-color:#15a566;background:#eafaf2}.ev.sched{border-left-color:#7a4fd0;background:#f1ecfb}.ev.int{border-left-color:#d98324;background:#fdf2e6}.ev.cli{border-left-color:#2f7bd9;background:#eaf2fc}
+  .qitem{display:flex;align-items:center;gap:11px;padding:11px 0;border-top:1px solid var(--line)}
+  .qitem:first-of-type{border-top:none}
+  .qi{flex:1;min-width:0}
+  .qi .qt{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .qi .qm{font-size:11px;color:var(--muted);margin-top:4px;display:flex;align-items:center;flex-wrap:wrap;gap:5px 7px}
+  .empty{text-align:center;color:var(--muted);font-size:13px;padding:30px 10px}
+  .htmap{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+  .htrow{display:grid;grid-template-columns:34px repeat(7,minmax(0,1fr));gap:5px;align-items:center}
+  .htd{font-size:11px;color:var(--muted);font-weight:700;text-align:center}
+  .htlab{font-size:11px;color:var(--muted);font-weight:700}
+  .htcell{height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:800}
+  .htcell.top{box-shadow:0 0 0 2px #fff,0 0 0 3px #d62976}
+  .btrec{margin-top:15px;font-size:12.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .btchip{background:var(--ig2);color:#fff;font-weight:800;font-size:12px;padding:4px 11px;border-radius:999px}
+  .recslots{display:flex;gap:8px;flex-wrap:wrap}
+  .bhead,.brow{display:grid;grid-template-columns:1fr 92px 132px 90px 30px;gap:7px;align-items:center}
+  .bhead{font-size:10.5px;color:var(--muted);font-weight:700;padding:0 2px 2px}
+  .bulktbl{display:flex;flex-direction:column;gap:8px;max-height:44vh;overflow:auto;margin:4px 0}
+  .brow input,.brow select{border:1px solid var(--line);border-radius:9px;padding:8px 9px;font-size:12.5px;font-family:inherit;background:#fbfbfe;min-width:0}
+  .brm{border:none;background:#f4f5fa;color:var(--muted);width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:15px;line-height:1;padding:0}
+  .brm:hover{background:#fdeaef;color:var(--down)}
+  .qitem.cl,.qi.cl,.thumb.cl{cursor:pointer}
+  .qitem.cl:hover .qt,.qi.cl:hover .qt{color:#5b2bbf}
+  .qr{text-align:right;flex-shrink:0}.qr b{font-size:14px;font-weight:800}.qr span{font-size:10px;color:var(--muted);display:block}
+  /* === GROWTH === */
+  .hero{background:var(--card);border-radius:22px;box-shadow:var(--sh);padding:24px;display:grid;grid-template-columns:310px 1fr;gap:24px;margin-bottom:16px;opacity:0;transform:translateY(14px);animation:rise .6s .05s forwards}
+  .herol{display:flex;align-items:center;gap:18px}
+  .ring{width:90px;height:90px;border-radius:50%;flex-shrink:0;background:conic-gradient(from -90deg,#f9ce34,#fa7e1e,#ee2a7b,#6228d7 var(--p,75%),#edeef4 var(--p,75%));display:flex;align-items:center;justify-content:center;position:relative}
+  .ring::before{content:'';position:absolute;inset:8px;background:var(--card);border-radius:50%;box-shadow:inset 0 1px 5px rgba(40,40,80,.06)}
+  .ring .rc{position:relative;text-align:center}
+  .ring .rv{font-weight:800;font-size:20px;line-height:1}
+  .ring .rl{font-size:9px;color:var(--muted);margin-top:2px}
+  .hero .lab{font-size:13px;color:var(--muted);font-weight:600}
+  .hero .big{font-size:48px;font-weight:800;line-height:1;margin:9px 0 6px;letter-spacing:-.02em}
+  .hero .since{font-size:12.5px;color:var(--muted)}
+  .growpill{display:inline-flex;align-items:center;gap:6px;background:var(--upbg);color:var(--up);font-weight:800;font-size:15px;padding:6px 13px;border-radius:999px;margin-top:13px;white-space:nowrap}
+  .growpill.dn{background:var(--downbg);color:var(--down)}
+  .health{margin-top:16px;font-size:12.5px;display:flex;align-items:center;flex-wrap:wrap;gap:5px 8px;color:var(--muted)}
+  .hdot{width:11px;height:11px;border-radius:50%}
+  .ct{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .ct b{font-size:14px}.ct span{font-size:12px;color:var(--muted)}
+  svg.chart{width:100%;height:170px;overflow:visible}
+  .chart .ln{fill:none;stroke:url(#gl);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:2600;stroke-dashoffset:2600;animation:draw 1.5s .35s cubic-bezier(.22,1,.36,1) forwards}
+  .chart .dot{fill:#fff;stroke:#d62976;stroke-width:3;opacity:0;animation:pop .4s 1.6s forwards}
+  .xlab{font-size:10px;fill:var(--muted)}
+  .grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px;position:relative;z-index:3}
+  .m{background:var(--card);border-radius:18px;box-shadow:var(--sh2);padding:16px;opacity:0;transform:translateY(12px);animation:rise .5s forwards}
+  .m:nth-child(1){animation-delay:.08s}.m:nth-child(2){animation-delay:.14s}.m:nth-child(3){animation-delay:.2s}.m:nth-child(4){animation-delay:.26s}.m:nth-child(5){animation-delay:.32s}
+  .m .mn{font-size:11.5px;color:var(--muted);font-weight:600}
+  .m .mv{font-size:23px;font-weight:800;margin:8px 0 6px}
+  .delta{font-size:11.5px;font-weight:800;display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:7px}
+  .delta.up{background:var(--upbg);color:var(--up)}.delta.dn{background:var(--downbg);color:var(--down)}
+  .spark{margin-top:8px;height:24px;width:100%}.spark path{fill:none;stroke-width:2;stroke-linecap:round}
+  .cols{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;position:relative;z-index:1}
+  .post{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+  .post:first-of-type{border-top:none}
+  .rkw{position:relative}.rkw .rk{position:absolute;top:-7px;left:-7px;width:21px;height:21px;border-radius:50%;background:var(--ig2);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(214,41,118,.4)}
+  .post .pi{flex:1;min-width:0}.post .pt{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .post .pm{font-size:11px;color:var(--muted);margin-top:3px}
+  .post .pr{text-align:right}.post .pr b{font-size:14px;font-weight:800}.post .pr span{font-size:10px;color:var(--muted);display:block}
+  .fbar{display:flex;flex-direction:column;gap:13px;margin-top:2px}
+  .fb{display:flex;align-items:center;gap:10px;font-size:12.5px}.fb .fn{width:60px;color:var(--muted);font-weight:600}
+  .ftrack{flex:1;height:10px;background:#eef0f6;border-radius:7px;overflow:hidden}
+  .ffill{height:100%;border-radius:7px;background:var(--ig2);width:0;transition:width 1s .5s cubic-bezier(.22,1,.36,1)}
+  .fb .fv{width:50px;text-align:right;font-weight:800}
+  .note{font-size:11px;color:var(--muted);margin-top:13px;line-height:1.6;border-top:1px dashed var(--line);padding-top:11px}
+  .panel h3{font-size:15px;font-weight:800;margin-bottom:3px}.panel .sub{font-size:12px;color:var(--muted);margin-bottom:14px}
+  /* growth: chart hover + metric drilldown + data info */
+  .chartarea{position:relative}
+  .cguide{position:absolute;top:0;bottom:22px;width:1px;background:#cdbdf2;display:none;pointer-events:none}
+  .ctip{position:absolute;top:0;background:#161b26;color:#fff;font-size:11px;padding:5px 9px;border-radius:8px;display:none;pointer-events:none;white-space:nowrap;z-index:20;box-shadow:var(--sh2)}
+  .ctip b{font-size:13px}.ctip span{color:#aeb4c2;margin-left:6px}
+  .m{position:relative}
+  .m .pop{position:absolute;left:0;top:calc(100% + 8px);z-index:30;width:234px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--sh);padding:12px;display:none;cursor:default}
+  .m:hover .pop{display:block}
+  .m:nth-child(4) .pop,.m:nth-child(5) .pop{left:auto;right:0}
+  .popt{font-size:11px;font-weight:800;margin-bottom:8px}
+  .poprow{display:flex;align-items:center;gap:8px;font-size:11.5px;padding:4px 0}
+  .poprow span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#39404f}
+  .poprow b{font-weight:800;white-space:nowrap}
+  .poprow i{font-style:normal;color:var(--muted);width:32px;text-align:right;font-size:10.5px}
+  .popnote{font-size:10.5px;color:var(--muted);margin-top:8px;border-top:1px dashed var(--line);padding-top:7px;line-height:1.65}
+  .mhint{font-size:9.5px;color:#b9bfcd;margin-top:7px}
+  .datainfo{margin-top:18px}.datainfo .abk{margin-bottom:4px}
+  /* growth: profile header + audience */
+  .phead{background:var(--card);border-radius:18px;box-shadow:var(--sh2);padding:18px 22px;display:flex;align-items:center;gap:18px;margin-bottom:16px}
+  .pav{width:62px;height:62px;border-radius:50%;background:var(--ig2);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:26px;flex-shrink:0}
+  .pinfo{flex:1;min-width:0}
+  .pname{font-size:16px;font-weight:800;display:flex;align-items:center;gap:6px}.pverif{color:#3897f0}
+  .phandle{font-size:12.5px;color:var(--muted);margin-top:1px}.pbio{font-size:12px;color:#39404f;margin-top:6px;line-height:1.55}
+  .pstats{display:flex;gap:24px;flex-shrink:0}
+  .pstat{text-align:center}.pstat b{font-size:18px;font-weight:800;display:block}.pstat span{font-size:11px;color:var(--muted)}
+  .aud{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-top:16px}
+  .agebar{display:flex;align-items:center;gap:10px;font-size:12px;margin-bottom:10px}
+  .agebar .agn{width:50px;color:var(--muted)}
+  .aget{flex:1;height:9px;background:#eef0f6;border-radius:6px;overflow:hidden}
+  .agef{height:100%;background:var(--ig2);border-radius:6px;width:0;transition:width .9s .3s cubic-bezier(.22,1,.36,1)}
+  .agebar .agv{width:38px;text-align:right;font-weight:700}
+  .genderwrap{display:flex;align-items:center;gap:24px;margin:12px 0 12px}
+  .gdonut2{width:120px;height:120px;position:relative;flex-shrink:0}
+  .gsvg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 10px rgba(214,41,118,.18))}
+  .gdc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .gdc b{font-size:22px;font-weight:800;line-height:1}.gdc span{font-size:10px;color:var(--muted);margin-top:3px}
+  .glegend2{display:flex;flex-direction:column;gap:15px}
+  .gl{display:flex;align-items:center;gap:12px}
+  .gl .gdot{width:13px;height:13px;border-radius:5px;flex-shrink:0}
+  .gl .gv b{font-size:17px;font-weight:800;display:block;line-height:1.05}.gl .gv span{font-size:11.5px;color:var(--muted)}
+  /* === REPORT === */
+  .rcallouts{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:8px 0 4px;padding:20px 22px;background:linear-gradient(135deg,#fbf7ff,#fff);border:1px solid #efe9fc;border-radius:14px}
+  .rco .rcl{font-size:11.5px;color:var(--muted);margin-bottom:6px}
+  .rco .rcv{font-size:30px;font-weight:800;letter-spacing:-.01em;line-height:1}
+  .rco .rcs{font-size:11px;color:var(--muted);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .report{max-width:720px;margin:0 auto}
+  .rtools{display:flex;gap:8px;align-items:center;margin-bottom:16px}
+  .rpaper{background:#fff;border-radius:18px;box-shadow:var(--sh);padding:40px 44px}
+  .rhead{display:flex;align-items:flex-start;gap:14px;border-bottom:2px solid #f0f1f5;padding-bottom:20px;margin-bottom:24px}
+  .rlogo{width:44px;height:44px;border-radius:12px;background:var(--ig2);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:20px;flex-shrink:0}
+  .rhead .rh{flex:1;min-width:0}.rhead .rt{font-size:20px;font-weight:800}.rhead .rs{font-size:12.5px;color:var(--muted);margin-top:3px}
+  .rhead .rp{font-size:12px;color:var(--muted);text-align:right;white-space:nowrap;line-height:1.7}
+  .rhero{display:flex;align-items:flex-end;gap:22px}
+  .rhero .rlab{font-size:12px;color:var(--muted);margin-bottom:6px}
+  .rhero .rbig{font-size:52px;font-weight:800;line-height:1;letter-spacing:-.02em}
+  .rgrow{display:inline-flex;align-items:center;gap:6px;background:var(--upbg);color:var(--up);font-weight:800;font-size:15px;padding:6px 13px;border-radius:999px;margin-bottom:8px;white-space:nowrap}
+  .rgrow.dn{background:var(--downbg);color:var(--down)}
+  .rlead{font-size:14px;color:#39404f;line-height:1.95;margin:16px 0 4px}
+  .rsec{font-size:12.5px;font-weight:800;background:var(--ig2);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block;margin:30px 0 12px}
+  .rmetrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .rmcard{border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--sh2)}
+  .rmcard .rmn{font-size:11px;color:var(--muted)}.rmcard .rmv{font-size:21px;font-weight:800;margin:7px 0 5px}
+  .rbest{display:flex;flex-direction:column;gap:12px}
+  .rbpost{display:flex;align-items:center;gap:13px}
+  .rbthumb{width:52px;height:52px;border-radius:11px;background-size:cover;background-position:center;flex-shrink:0;position:relative;overflow:hidden}
+  .rbrank{position:absolute;top:-6px;left:-6px;width:20px;height:20px;border-radius:50%;background:var(--ig2);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .rbi{flex:1;min-width:0}.rbt{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rbm{font-size:11.5px;color:var(--muted);margin-top:3px}
+  .rbr{text-align:right}.rbr b{font-size:15px;font-weight:800}.rbr span{font-size:10px;color:var(--muted);display:block}
+  .rnext{background:#faf8ff;border:1px solid #efe9fc;border-radius:12px;padding:16px 19px}
+  .rnext .rnl{display:flex;gap:10px;padding:7px 0;font-size:13px;line-height:1.8;color:#39404f}
+  .rnext .rnl b{color:#5b2bbf}
+  .rfoot{margin-top:32px;padding-top:16px;border-top:1px solid #f0f1f5;font-size:11px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+  @media print{
+    @page{margin:14mm}
+    body{background:#fff}
+    .side,.rtools,#toast,.ov{display:none !important}
+    .main{padding:0;max-width:none}.report{max-width:none}
+    .rpaper{box-shadow:none;border-radius:0;padding:0}
+    .rsec{background:none;-webkit-text-fill-color:#bc1888;color:#bc1888}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+  /* === APPROVE === */
+  .arow{display:flex;align-items:center;gap:13px;padding:14px;border:1px solid var(--line);border-radius:16px;margin-bottom:11px;background:#fff;transition:.15s;flex-wrap:wrap;box-shadow:var(--sh2)}
+  .arow:hover{box-shadow:var(--sh2)}
+  .arc{display:flex;align-items:center;gap:13px;flex:1;min-width:0;cursor:pointer}
+  .arc .arrow{color:#c2c8d6;font-size:21px;flex-shrink:0;transition:.15s}
+  .arc:hover .at{color:#5b2bbf}.arc:hover .arrow{color:#5b2bbf;transform:translateX(2px)}
+  .ai{flex:1;min-width:0}.ai .at{font-size:14px;font-weight:700;transition:.15s}.ai .am{font-size:11.5px;color:var(--muted);margin-top:5px;display:flex;gap:5px 7px;align-items:center;flex-wrap:wrap}
+  .checks{display:flex;gap:8px;flex-shrink:0}
+  .ck{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 11px;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted);transition:.15s;display:flex;align-items:center;gap:5px;font-family:inherit}
+  .ck:hover{border-color:#bba6e8}
+  .ck.done{background:var(--upbg);color:var(--up);border-color:transparent}
+  .ck.done:hover{background:#d7efe2}
+  /* detail preview modal */
+  .dprev{width:100%;aspect-ratio:1/1;border-radius:14px;background-size:cover;background-position:center;position:relative;margin-bottom:16px;overflow:hidden}
+  .dprev .pfmt{position:absolute;top:10px;left:10px;background:rgba(20,20,30,.6);color:#fff;border:none;font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px}
+  .dt-theme{font-size:17px;font-weight:800}
+  .dt-when{font-size:12px;color:var(--muted);margin-top:7px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .dt-cap{font-size:13px;line-height:1.9;margin-top:14px;white-space:pre-wrap;color:#39404f}
+  .dacts{display:flex;gap:9px;margin-top:20px}
+  .dacts .ck{flex:1;justify-content:center;padding:11px}
+  .dhint{font-size:11px;color:var(--muted);margin-top:11px;text-align:center}
+  .dmetrics{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:18px}
+  .dmetrics div{background:#f7f8fc;border-radius:11px;padding:11px 6px;text-align:center}
+  .dmetrics b{font-size:16px;font-weight:800;display:block}.dmetrics span{font-size:10px;color:var(--muted)}
+  /* === ABOUT (editorial) === */
+  .about2{max-width:660px}
+  .abhead .kick{font-size:11px;letter-spacing:.22em;color:var(--muted);font-weight:700}
+  .abhead h2{font-size:25px;font-weight:800;margin:8px 0 0;letter-spacing:.01em}
+  .abhead .alead{font-size:15px;line-height:2;color:#39404f;margin-top:14px}
+  .abs{margin-top:42px}
+  .abk{font-size:12.5px;font-weight:800;letter-spacing:.06em;background:var(--ig2);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+  .prin{list-style:none;margin-top:8px}
+  .prin li{display:flex;gap:18px;padding:18px 2px;border-top:1px solid var(--line)}
+  .prin li:first-child{border-top:none}
+  .prin .no{font-size:16px;font-weight:800;width:24px;flex-shrink:0;background:var(--ig2);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .prin b{font-size:15px;display:block;margin-bottom:7px;letter-spacing:.01em}
+  .prin p{font-size:13px;color:var(--muted);line-height:1.95}
+  .spec{margin-top:12px}
+  .srow{display:grid;grid-template-columns:150px 1fr;gap:16px;padding:15px 2px;border-top:1px solid var(--line)}
+  .srow:first-child{border-top:none}
+  .srow dt{font-size:13px;font-weight:700;color:var(--text)}
+  .srow dd{font-size:13px;color:#39404f;line-height:1.9}
+  .abfoot{font-size:12px;color:var(--muted);margin-top:28px;padding-top:16px;border-top:1px dashed var(--line);line-height:1.95}
+  /* modal */
+  .ov{position:fixed;inset:0;background:rgba(15,18,30,.5);display:none;align-items:center;justify-content:center;padding:18px;z-index:50;backdrop-filter:blur(3px)}
+  .ov.show{display:flex}
+  .ov.anchored{align-items:flex-start;justify-content:flex-start}
+  .mwhen{font-size:12px;color:#5b2bbf;font-weight:700;margin:-8px 0 14px}
+  .modal{background:#fff;border-radius:20px;max-width:460px;width:100%;padding:24px;box-shadow:var(--sh);max-height:92vh;overflow:auto}
+  .modal h3{font-size:17px;margin-bottom:14px}
+  .f{margin-bottom:13px}.f label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px;font-weight:600}
+  .f input,.f textarea,.f select{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px 13px;font-size:14px;font-family:inherit;background:#fbfbfe;box-shadow:inset 0 1px 3px rgba(45,45,95,.045);transition:.15s}
+  .f input:focus,.f textarea:focus,.f select:focus{outline:none;border-color:#cdbdf2;box-shadow:inset 0 1px 3px rgba(45,45,95,.04),0 0 0 3px rgba(98,40,215,.08);background:#fff}
+  .f textarea{resize:vertical;min-height:62px}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .fmtsel{display:flex;gap:7px;flex-wrap:wrap}
+  .fmtopt{border:1px solid var(--line);border-radius:9px;padding:8px 13px;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--muted);transition:.15s}
+  .fmtopt.on{background:#f0effa;color:#5b2bbf;border-color:#cdbdf2}
+  .storyhint{font-size:11px;color:var(--warn);margin-top:7px;display:none}
+  .mfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+  #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(18px);background:#161b26;color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;opacity:0;transition:.25s;z-index:80;box-shadow:var(--sh)}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media(max-width:880px){
+    html,body{overflow-x:clip}
+    .app{flex-direction:column;width:100%;max-width:100%;min-width:0}
+    .side{width:100%;height:auto;position:static;display:flex;flex-wrap:wrap;align-items:center;min-width:0}
+    .nav{flex-direction:row;flex-wrap:wrap;width:100%}
+    .main{flex:1;width:100%;max-width:100%;min-width:0}
+    .view,.calwrap,.panel,.cal{min-width:0}
+    .calwrap,.cols,.grid5,.aud{grid-template-columns:minmax(0,1fr)}
+    .hero{grid-template-columns:1fr}.srow{grid-template-columns:1fr;gap:4px}.phead,.ph{flex-wrap:wrap}
+  }
+  @media(max-width:560px){
+    .main{padding:20px 15px 50px}
+    .modal{padding:20px 16px}
+    .side .acc{margin-left:auto}
+    .side .demo{flex-basis:100%;margin-top:8px}
+    .ph .gr{display:none}
+    .ph h2{flex:1 1 100%;font-size:19px}
+    .ph .btn{flex:1 1 auto;justify-content:center;padding:9px 13px;font-size:13px}
+    .bhead{display:none}
+    .brow{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px;background:#fafaff;border:1px solid var(--line);border-radius:11px;padding:10px}
+    .brow .b-theme{grid-column:1/-1}
+    .brow .brm{justify-self:end}
+    .cell{min-height:62px;padding:4px}
+    .ev .evth{display:none}
+    .ev{padding:3px 5px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><div class="logo">G</div><div class="bt"><b>GROW&nbsp;Suite</b><span>Instagram運用ツール</span></div></div>
+    <nav class="nav" id="nav">
+      <button data-t="cal" class="on"><span class="ico">📅</span>予約・カレンダー</button>
+      <button data-t="approve"><span class="ico">✅</span>管理・承認<span class="badge" id="apvBadge">0</span></button>
+      <button data-t="growth"><span class="ico">📈</span>成長</button>
+      <button data-t="report"><span class="ico">📄</span>クライアントレポート</button>
+      <button data-t="about"><span class="ico">ℹ️</span>このツールについて</button>
+    </nav>
+    <div class="acc"><b>@your_brand</b><span style="color:var(--muted)">フォロワー <span id="sideFoll">–</span></span></div>
+    <div class="demo">※デモ版：実際のIG投稿は行わず動作をシミュレートします。</div>
+  </aside>
+
+  <main class="main" id="main"></main>
+</div>
+
+<!-- new post modal -->
+<div class="ov" id="ov"><div class="modal">
+  <h3>新規投稿を予約</h3>
+  <div class="mwhen" id="m_when"></div>
+  <div class="f"><label>テーマ（社内管理名）</label><input id="m_theme" placeholder="例）7月キャンペーン告知"></div>
+  <div class="f"><label>形式</label>
+    <div class="fmtsel" id="m_fmt">
+      <div class="fmtopt on" data-v="フィード">フィード</div>
+      <div class="fmtopt" data-v="カルーセル">カルーセル</div>
+      <div class="fmtopt" data-v="リール">リール</div>
+      <div class="fmtopt" data-v="ストーリー">ストーリー</div>
+    </div>
+    <div class="storyhint" id="storyHint">⚠️ ストーリーズは仕様上「自動投稿」できません。予約時刻にリマインド通知でお知らせします。</div>
+  </div>
+  <div class="f"><label>おすすめ投稿時間（タップで日時を設定）</label><div class="recslots" id="recSlots"></div></div>
+  <div class="f"><label>写真・動画（カルーセルは最大10枚、リールは動画）</label>
+    <input type="file" id="m_media" accept="image/*,video/*" multiple onchange="onPickMedia(event)" style="display:none">
+    <button type="button" class="btn ghost sm" onclick="document.getElementById('m_media').click()">＋ 写真・動画を追加</button>
+    <div id="m_thumbs" class="mthumbs"></div>
+  </div>
+  <div class="f"><label>キャプション</label><textarea id="m_cap" placeholder="本文・ハッシュタグ"></textarea></div>
+  <div class="frow">
+    <div class="f"><label>予約日</label><input type="date" id="m_date"></div>
+    <div class="f"><label>時刻</label><input type="time" id="m_time" value="19:00"></div>
+  </div>
+  <div class="mfoot"><button class="btn ghost" onclick="closeOv()">キャンセル</button><button class="btn ig" onclick="savePost()">予約に追加</button></div>
+</div></div>
+
+<!-- add growth data modal -->
+<div class="ov" id="ovG"><div class="modal">
+  <h3>成長データを追加</h3>
+  <div class="f"><label>計測日</label><input type="date" id="g_date"></div>
+  <div class="frow">
+    <div class="f"><label>フォロワー数</label><input type="number" id="g_foll" placeholder="10450"></div>
+    <div class="f"><label>リーチ</label><input type="number" id="g_reach" placeholder="50200"></div>
+  </div>
+  <div class="frow">
+    <div class="f"><label>視聴(views)</label><input type="number" id="g_views" placeholder="93000"></div>
+    <div class="f"><label>非フォロワー比%</label><input type="number" id="g_nf" placeholder="61"></div>
+  </div>
+  <div class="frow">
+    <div class="f"><label>送信/シェア</label><input type="number" id="g_sends" placeholder="680"></div>
+    <div class="f"><label>保存率%</label><input type="number" id="g_save" placeholder="3.5"></div>
+  </div>
+  <div class="mfoot"><button class="btn ghost" onclick="closeOvG()">キャンセル</button><button class="btn ig" onclick="saveGrowth()">追加</button></div>
+</div></div>
+
+<!-- post detail / review modal -->
+<div class="ov" id="ovD"><div class="modal" style="max-width:400px"><div id="detailBody"></div>
+  <div class="mfoot" style="margin-top:16px"><button class="btn ghost" onclick="closeOvD()">閉じる</button></div>
+</div></div>
+
+<!-- client guest approval portal -->
+<div class="ovc" id="ovC">
+  <button class="cvclose" id="cvClose" onclick="closeClientView()">✕ プレビューを閉じる</button>
+  <div class="cv" id="cvBody"></div>
+</div>
+
+<!-- bulk schedule modal -->
+<div class="ov" id="ovB"><div class="modal" style="max-width:650px">
+  <h3>一括予約</h3>
+  <div style="font-size:12.5px;color:var(--muted);margin:6px 0 14px;line-height:1.7">複数の投稿の枠（テーマ・形式・日時）を一度にまとめて押さえます。「おすすめ枠で日時を自動入力」を押すと、日付が空いている行に最適投稿時間を自動で割り振ります。各投稿は予約後、承認フローに並びます。</div>
+  <div class="bhead"><div>テーマ</div><div>形式</div><div>日付</div><div>時刻</div><div></div></div>
+  <div class="bulktbl" id="bulkRows"></div>
+  <button class="btn ghost sm" style="margin-top:9px" onclick="addBulkRow()">＋ 行を追加</button>
+  <div class="mfoot" style="margin-top:16px;align-items:center"><button class="btn ghost" onclick="autofillBulk()">おすすめ枠で日時を自動入力</button><div style="flex:1"></div><button class="btn ghost" onclick="closeOvB()">キャンセル</button><button class="btn ig" onclick="saveBulk()">まとめて予約</button></div>
+</div></div>
+
+<!-- share client link modal -->
+<div class="ov" id="ovS"><div class="modal" style="max-width:450px">
+  <h3>クライアント確認リンクを共有</h3>
+  <div style="font-size:12.5px;color:var(--muted);margin:6px 0 16px;line-height:1.75">このリンクをクライアントにメール／LINEで送ってください。クライアントは<b>ログイン不要</b>で、確認画面だけが開きます（運用画面は見えません）。承認・修正依頼はこの管理画面に反映されます。</div>
+  <div class="f"><label>共有リンク</label><input id="shareLink" readonly onclick="this.select()"></div>
+  <div class="mfoot"><button class="btn ghost" onclick="openClientView(true)">プレビューを見る</button><button class="btn ig" onclick="copyShareLink()">リンクをコピー</button></div>
+</div></div>
+
+<div id="toast"></div>
+
+<script>
+const KEY='karakuri_suite_v3';
+let tab='cal', period='month', queueMode='up';
+let calRef=new Date(2026,5,1); // June 2026 (demo)
+const TODAY='2026-06-27';
+const HDAYS=['月','火','水','木','金','土','日'];
+const BUCKETS=[['朝','08:00'],['昼','12:00'],['夕','19:00'],['夜','21:00']];
+const ACTIVITY=[[35,38,36,40,42,55,50],[62,65,60,68,70,72,68],[70,74,72,78,80,76,70],[82,85,80,88,90,86,78]];
+const TOPSLOTS=(()=>{const a=[];ACTIVITY.forEach((r,bi)=>r.forEach((v,di)=>a.push({bi,di,v})));a.sort((x,y)=>y.v-x.v);return a.slice(0,3);})();
+let store=load();
+
+function load(){
+  const raw=localStorage.getItem(KEY);
+  if(raw){try{return JSON.parse(raw);}catch(e){}}
+  const img=u=>`https://images.unsplash.com/${u}?w=200&q=80`;
+  return {
+    posts:[
+      {id:1,theme:'春の新作スイーツ',fmt:'リール',cap:'春の新作、出ました🌸',when:'2026-04-02T19:00',posted:true,ap:{i:true,c:true},mt:{reach:19500,views:36000,saves:720,sends:290},img:img('photo-1488900128323-21503983a07e')},
+      {id:2,theme:'はじめての方へ',fmt:'カルーセル',cap:'保存して見返してね。',when:'2026-04-05T12:00',posted:true,ap:{i:true,c:true},mt:{reach:31000,views:49000,saves:1850,sends:430},img:img('photo-1556910103-1c02745aae4d')},
+      {id:3,theme:'スタッフ日記',fmt:'フィード',cap:'',when:'2026-04-09T18:00',posted:true,ap:{i:true,c:true},mt:{reach:8800,views:14000,saves:180,sends:90},img:img('photo-1517248135467-4c7edcad34c4')},
+      {id:4,theme:'作り方リール',fmt:'リール',cap:'',when:'2026-04-14T20:00',posted:true,ap:{i:true,c:true},mt:{reach:24500,views:47000,saves:980,sends:360},img:img('photo-1495474472287-4d71bcdd2085')},
+      {id:5,theme:'よくある質問',fmt:'カルーセル',cap:'',when:'2026-04-19T12:00',posted:true,ap:{i:true,c:true},mt:{reach:27800,views:44000,saves:1620,sends:380},img:img('photo-1556742502-ec7c0e9f34b1')},
+      {id:6,theme:'店内の様子',fmt:'フィード',cap:'',when:'2026-04-24T18:00',posted:true,ap:{i:true,c:true},mt:{reach:11200,views:17500,saves:260,sends:120},img:img('photo-1565958011703-44f9829ba187')},
+      {id:7,theme:'限定メニュー紹介',fmt:'リール',cap:'',when:'2026-04-29T19:00',posted:true,ap:{i:true,c:true},mt:{reach:33500,views:62000,saves:1280,sends:480},img:img('photo-1567620905732-2d1ec7ab7445')},
+      {id:8,theme:'お客様の声',fmt:'カルーセル',cap:'',when:'2026-05-03T12:00',posted:true,ap:{i:true,c:true},mt:{reach:36000,views:58000,saves:2100,sends:510},img:img('photo-1556910103-1c02745aae4d')},
+      {id:9,theme:'新スタッフ紹介',fmt:'フィード',cap:'',when:'2026-05-08T18:00',posted:true,ap:{i:true,c:true},mt:{reach:9800,views:15000,saves:210,sends:100},img:img('photo-1517248135467-4c7edcad34c4')},
+      {id:10,theme:'季節の食材',fmt:'リール',cap:'',when:'2026-05-13T19:00',posted:true,ap:{i:true,c:true},mt:{reach:41000,views:76000,saves:1700,sends:600},img:img('photo-1495474472287-4d71bcdd2085')},
+      {id:11,theme:'使い方ガイド5ステップ',fmt:'カルーセル',cap:'保存推奨📌',when:'2026-05-18T12:00',posted:true,ap:{i:true,c:true},mt:{reach:48000,views:84000,saves:2900,sends:690},img:img('photo-1556742502-ec7c0e9f34b1')},
+      {id:12,theme:'季節限定パッケージ',fmt:'フィード',cap:'',when:'2026-05-22T18:00',posted:true,ap:{i:true,c:true},mt:{reach:13500,views:21000,saves:340,sends:150},img:img('photo-1565958011703-44f9829ba187')},
+      {id:13,theme:'製造の裏側',fmt:'リール',cap:'',when:'2026-05-27T20:00',posted:true,ap:{i:true,c:true},mt:{reach:28000,views:52000,saves:1050,sends:380},img:img('photo-1488900128323-21503983a07e')},
+      {id:14,theme:'保存版レシピ',fmt:'カルーセル',cap:'保存して作ってね。',when:'2026-06-01T12:00',posted:true,ap:{i:true,c:true},mt:{reach:44000,views:72000,saves:3200,sends:640},img:img('photo-1556910103-1c02745aae4d')},
+      {id:15,theme:'営業時間のお知らせ',fmt:'フィード',cap:'',when:'2026-06-05T18:00',posted:true,ap:{i:true,c:true},mt:{reach:10500,views:16000,saves:230,sends:110},img:img('photo-1607083206869-4c7672e72a8a')},
+      {id:16,theme:'バズった瞬間',fmt:'リール',cap:'まさかの反響でした😳',when:'2026-06-10T19:00',posted:true,ap:{i:true,c:true},mt:{reach:52000,views:98000,saves:2100,sends:820},img:img('photo-1567620905732-2d1ec7ab7445')},
+      {id:17,theme:'お客様の声まとめ',fmt:'カルーセル',cap:'',when:'2026-06-15T18:00',posted:true,ap:{i:true,c:true},mt:{reach:41000,views:68200,saves:2280,sends:560},img:img('photo-1556742502-ec7c0e9f34b1')},
+      {id:18,theme:'夏の新作アイス3種',fmt:'リール',cap:'新作アイス、出ました🍨',when:'2026-06-20T19:00',posted:true,ap:{i:true,c:true},mt:{reach:38200,views:71500,saves:1640,sends:520},img:img('photo-1488900128323-21503983a07e')},
+      {id:19,theme:'夏フェス出店のお知らせ',fmt:'カルーセル',cap:'今年も夏フェスに出店します🎪\nブースNo.は後日お知らせ！\n#夏フェス #出店',when:'2026-06-28T12:00',posted:false,ap:{i:true,c:false},mt:null,img:img('photo-1488900128323-21503983a07e')},
+      {id:20,theme:'7月の新メニュー予告',fmt:'リール',cap:'来月、待望の新メニューが登場👀\nお楽しみに。',when:'2026-06-29T19:00',posted:false,ap:{i:true,c:false},mt:null,img:img('photo-1495474472287-4d71bcdd2085')},
+      {id:21,theme:'新商品ティザー',fmt:'カルーセル',cap:'近日公開。何が出るかは…お楽しみ🤫',when:'2026-06-30T18:00',posted:false,ap:{i:true,c:false},mt:null,img:img('photo-1565958011703-44f9829ba187')},
+      {id:22,theme:'スタッフ募集のお知らせ',fmt:'フィード',cap:'一緒に働く仲間を募集中です。\n詳細はプロフィールのリンクから。',when:'2026-07-02T12:00',posted:false,ap:{i:true,c:false},mt:null,img:img('photo-1517248135467-4c7edcad34c4')},
+      {id:23,theme:'七夕キャンペーン',fmt:'カルーセル',cap:'7/7まで！対象商品が10%OFF🎋\n#七夕 #キャンペーン',when:'2026-07-03T12:00',posted:false,ap:{i:true,c:false},mt:null,img:img('photo-1556910103-1c02745aae4d')},
+      {id:24,theme:'夏の限定パッケージ第2弾',fmt:'フィード',cap:'夏限定パッケージ、第2弾が登場。',when:'2026-07-05T18:00',posted:false,ap:{i:true,c:false},mt:null,img:img('photo-1565958011703-44f9829ba187')},
+      {id:25,theme:'サマーセール予告',fmt:'リール',cap:'来週からサマーセール開始🔥',when:'2026-07-07T19:00',posted:false,ap:{i:true,c:true},mt:null,img:img('photo-1517248135467-4c7edcad34c4')},
+      {id:26,theme:'夏季限定メニュー告知',fmt:'ストーリー',cap:'',when:'2026-07-08T11:00',posted:false,ap:{i:false,c:false},mt:null,img:img('photo-1567620905732-2d1ec7ab7445')},
+    ],
+    snaps:[
+      {d:'2026-03-30',foll:6800,reach:22000,views:39000,nf:42,sends:210,save:2.2},
+      {d:'2026-04-06',foll:6960,reach:24500,views:43000,nf:44,sends:240,save:2.4},
+      {d:'2026-04-13',foll:7050,reach:21800,views:38500,nf:43,sends:225,save:2.1},
+      {d:'2026-04-20',foll:7240,reach:27000,views:47000,nf:47,sends:280,save:2.5},
+      {d:'2026-04-27',foll:7520,reach:30000,views:52000,nf:49,sends:320,save:2.6},
+      {d:'2026-05-04',foll:7780,reach:28500,views:50000,nf:48,sends:300,save:2.5},
+      {d:'2026-05-11',foll:8120,reach:33000,views:58000,nf:51,sends:360,save:2.8},
+      {d:'2026-05-18',foll:8460,reach:36500,views:64000,nf:53,sends:410,save:2.9},
+      {d:'2026-05-25',foll:8900,reach:39000,views:69000,nf:55,sends:460,save:3.0},
+      {d:'2026-06-01',foll:9180,reach:41500,views:75000,nf:56,sends:500,save:3.1},
+      {d:'2026-06-08',foll:9560,reach:44000,views:80000,nf:58,sends:560,save:3.2},
+      {d:'2026-06-15',foll:10010,reach:47000,views:86000,nf:60,sends:620,save:3.4},
+      {d:'2026-06-22',foll:10450,reach:50200,views:93000,nf:61,sends:680,save:3.5},
+    ],
+    audience:{following:312,age:[['18-24',22],['25-34',41],['35-44',23],['45-54',9],['55+',5]],gender:{f:63,m:37}},
+  };
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store,(k,v)=>k==='_url'?undefined:v));}catch(e){toast('保存容量の上限です。画像・動画が多すぎる可能性があります');}}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function fmtNum(n){return Math.round(n).toLocaleString('ja-JP');}
+function pct(n){return (n>=0?'+':'')+n.toFixed(1)+'%';}
+function delta(c,p){return p?((c-p)/p*100):0;}
+function statusOf(p){
+  if(p.posted)return{k:'posted',t:'投稿済み'};
+  if(!p.ap.i)return{k:'int',t:'社内確認待ち'};
+  if(!p.ap.c)return{k:'cli',t:'クライアント確認待ち'};
+  return{k:'sched',t:'予約済み'};
+}
+function pendingCount(){return store.posts.filter(p=>!p.posted&&!(p.ap.i&&p.ap.c)).length;}
+
+/* ---- nav ---- */
+document.getElementById('nav').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;tab=b.dataset.t;
+  document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('on',x===b));
+  render();
+});
+function render(){
+  document.getElementById('sideFoll').textContent=fmtNum(store.snaps[store.snaps.length-1].foll);
+  document.getElementById('apvBadge').textContent=pendingCount();
+  document.getElementById('apvBadge').style.display=pendingCount()?'inline-block':'none';
+  const m=document.getElementById('main');
+  if(tab==='cal')renderCal(m);
+  else if(tab==='approve')renderApprove(m);
+  else if(tab==='growth')renderGrowth(m);
+  else if(tab==='report')renderReport(m);
+  else renderAbout(m);
+}
+
+/* ===== CALENDAR / QUEUE ===== */
+function renderCal(m){
+  m.innerHTML=`<div class="view">
+    <div class="ph"><h2>予約・カレンダー</h2><div class="gr"></div>
+      <button class="btn ghost" onclick="openBulk()">≡ 一括予約</button>
+      <button class="btn ig" onclick="openPost()">＋ 新規投稿を予約</button></div>
+    <div class="psub">作成・予約した投稿が、誰が見ても"いつ何が出るか"一目で分かる。投稿の写真をクリックすれば、過去の投稿も中身を確認できます。</div>
+    <div class="calwrap">
+      <div class="panel">
+        <div class="calhead"><b id="calTitle"></b>
+          <div class="calnav"><button onclick="moveCal(-1)">‹</button><button onclick="moveCal(1)">›</button></div></div>
+        <div class="cal" id="cal"></div>
+        <div class="note" style="display:flex;flex-wrap:wrap;gap:4px 12px"><span class="nw">🟩 投稿済み</span><span class="nw">🟪 予約済み</span><span class="nw">🟧 社内確認待ち</span><span class="nw">🟦 クライアント確認待ち</span></div>
+      </div>
+      <div class="panel">
+        <div class="seg" id="qseg" style="margin-bottom:13px"><button data-q="up" class="${queueMode==='up'?'on':''}">これから</button><button data-q="done" class="${queueMode==='done'?'on':''}">投稿済み</button></div>
+        <div id="queue"></div>
+      </div>
+    </div>
+    ${bestTimesPanel()}
+  </div>`;
+  drawCal();renderQueue();
+  document.getElementById('qseg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;queueMode=b.dataset.q;document.querySelectorAll('#qseg button').forEach(x=>x.classList.toggle('on',x===b));renderQueue();});
+}
+function bestTimesPanel(){
+  return `<div class="panel" style="margin-top:18px">
+    <h3>最適投稿時間</h3><div class="sub">フォロワーがアクティブな時間帯。濃いほど反応が見込めます（過去の傾向から自動算出）。</div>
+    <div class="htmap">
+      <div class="htrow"><div class="htlab"></div>${HDAYS.map(d=>`<div class="htd">${d}</div>`).join('')}</div>
+      ${BUCKETS.map((b,bi)=>`<div class="htrow"><div class="htlab">${b[0]}</div>${ACTIVITY[bi].map((v,di)=>{const top=TOPSLOTS.some(t=>t.bi===bi&&t.di===di);return `<div class="htcell${top?' top':''}" style="background:rgba(214,41,118,${(v/100*0.88).toFixed(2)})" title="${HDAYS[di]}曜 ${b[0]}：活性度 ${v}">${top?'★':''}</div>`;}).join('')}</div>`).join('')}
+    </div>
+    <div class="btrec">おすすめの投稿枠：${TOPSLOTS.map(t=>`<span class="btchip">${HDAYS[t.di]} ${BUCKETS[t.bi][1]}</span>`).join('')}<span style="color:var(--muted);font-size:11.5px">新規作成時にも提案されます</span></div>
+  </div>`;
+}
+function renderQueue(){
+  const q=document.getElementById('queue');if(!q)return;
+  if(queueMode==='up'){
+    const up=store.posts.filter(p=>!p.posted).sort((a,b)=>a.when<b.when?-1:1);
+    q.innerHTML=up.length?up.map(p=>{const s=statusOf(p),dt=new Date(p.when),canPost=s.k==='sched';
+      return `<div class="qitem">
+        <div class="thumb cl" onclick="openDetail(${p.id})" style="background-image:url('${mediaThumb(p)}'),var(--ig2)">${mediaOverlay(p)}</div>
+        <div class="qi cl" onclick="openDetail(${p.id})"><div class="qt">${esc(p.theme)}</div>
+          <div class="qm"><span class="fmtb">${p.fmt}</span><span class="nw">${dt.getMonth()+1}/${dt.getDate()} ${('0'+dt.getHours()).slice(-2)}:${('0'+dt.getMinutes()).slice(-2)}</span><span class="chip ${s.k}">${s.t}</span></div></div>
+        ${canPost?`<button class="btn ig sm" onclick="doPost(${p.id})">${p.fmt==='ストーリー'?'リマインド':'今すぐ投稿'}</button>`:''}
+      </div>`;}).join(''):`<div class="empty">予約中の投稿はありません</div>`;
+  }else{
+    const done=store.posts.filter(p=>p.posted).sort((a,b)=>a.when<b.when?1:-1);
+    q.innerHTML=done.length?done.map(p=>{const dt=new Date(p.when);
+      return `<div class="qitem cl" onclick="openDetail(${p.id})">
+        <div class="thumb" style="background-image:url('${mediaThumb(p)}'),var(--ig2)">${mediaOverlay(p)}</div>
+        <div class="qi"><div class="qt">${esc(p.theme)}</div>
+          <div class="qm"><span class="fmtb">${p.fmt}</span><span class="nw">${('0'+(dt.getMonth()+1)).slice(-2)}/${('0'+dt.getDate()).slice(-2)}</span><span class="chip posted">投稿済み</span></div></div>
+        <div class="qr"><b>${p.mt?fmtNum(p.mt.reach):'–'}</b><span>リーチ</span></div>
+      </div>`;}).join(''):`<div class="empty">投稿済みはまだありません</div>`;
+  }
+}
+function drawCal(){
+  const y=calRef.getFullYear(),mo=calRef.getMonth();
+  document.getElementById('calTitle').textContent=`${y}年 ${mo+1}月`;
+  const first=new Date(y,mo,1).getDay(),days=new Date(y,mo+1,0).getDate();
+  const dows=['日','月','火','水','木','金','土'];
+  let h=dows.map(d=>`<div class="dow">${d}</div>`).join('');
+  for(let i=0;i<first;i++)h+=`<div class="cell pad"></div>`;
+  for(let d=1;d<=days;d++){
+    const ds=`${y}-${('0'+(mo+1)).slice(-2)}-${('0'+d).slice(-2)}`;
+    const evs=store.posts.filter(p=>p.when.slice(0,10)===ds);
+    const isToday=ds===TODAY;
+    h+=`<div class="cell${isToday?' today':''}" onclick="openPostOn('${ds}',event)" title="${ds} に投稿を作成"><div class="dn">${d}</div><span class="add">＋</span>`+
+      evs.map(p=>{const s=statusOf(p);return `<div class="ev ${s.k}" title="${esc(p.theme)}（${s.t}）" onclick="event.stopPropagation();openDetail(${p.id})"><span class="evth" style="background-image:url('${mediaThumb(p)}'),var(--ig2)"></span><span class="evtx">${esc(p.theme)}</span></div>`;}).join('')+`</div>`;
+  }
+  document.getElementById('cal').innerHTML=h;
+}
+function moveCal(d){calRef=new Date(calRef.getFullYear(),calRef.getMonth()+d,1);drawCal();}
+function doPost(id){
+  const p=store.posts.find(x=>x.id===id);if(!p)return;
+  if(p.fmt==='ストーリー'){toast('リマインド通知を送りました（ストーリーは手動投稿）');return;}
+  p.posted=true;
+  const rch=Math.round(store.snaps[store.snaps.length-1].reach*0.7);
+  p.mt={reach:rch,views:Math.round(rch*1.7),saves:Math.round(300+Math.random()*1500),sends:Math.round(150+Math.random()*500)};
+  save();render();toast('投稿しました（シミュレート）');
+}
+
+/* ===== APPROVE ===== */
+function renderApprove(m){
+  const list=store.posts.filter(p=>!p.posted).sort((a,b)=>a.when<b.when?-1:1);
+  m.innerHTML=`<div class="view">
+    <div class="ph"><h2>管理・承認</h2><div class="gr"></div><button class="btn ig" onclick="openShare()">クライアント確認リンクを共有</button></div>
+    <div class="psub">下に任せても抜け漏れゼロ。投稿をタップして中身を確認し、「社内確認 → クライアント確認」の二段階で承認。クライアントには専用ビュー（上のボタン）を共有でき、承認・修正依頼がここに反映されます。</div>
+    ${list.length?list.map(p=>{
+      const dt=new Date(p.when),s=statusOf(p);
+      return `<div class="arow">
+        <div class="arc" onclick="openDetail(${p.id})">
+          <div class="thumb" style="background-image:url('${mediaThumb(p)}'),var(--ig2)">${mediaOverlay(p)}</div>
+          <div class="ai"><div class="at">${esc(p.theme)}</div>
+            <div class="am"><span class="fmtb">${p.fmt}</span><span class="nw">${dt.getMonth()+1}/${dt.getDate()} ${('0'+dt.getHours()).slice(-2)}:${('0'+dt.getMinutes()).slice(-2)} 予約</span><span class="chip ${s.k}">${s.t}</span>${p.needsFix?`<span class="chip" style="background:var(--warnbg);color:var(--warn)">修正依頼</span>`:''}</div>
+            ${p.needsFix&&p.note?`<div style="font-size:11.5px;color:var(--warn);margin-top:5px">クライアントより：${esc(p.note)}</div>`:''}</div>
+          <span class="arrow">›</span>
+        </div>
+        <div class="checks">
+          <button class="ck ${p.ap.i?'done':''}" onclick="approve(${p.id},'i')">${p.ap.i?'✓ ':''}社内確認</button>
+          <button class="ck ${p.ap.c?'done':''}" onclick="approve(${p.id},'c')" ${!p.ap.i?'style="opacity:.4"':''}>${p.ap.c?'✓ ':''}クライアント確認</button>
+        </div></div>`;
+    }).join(''):`<div class="empty">承認待ちの投稿はありません。</div>`}
+  </div>`;
+}
+function approve(id,who){
+  const p=store.posts.find(x=>x.id===id);if(!p)return;
+  if(who==='i'){p.ap.i=!p.ap.i;if(!p.ap.i)p.ap.c=false;toast(p.ap.i?'社内確認しました':'社内確認を取り消しました');}
+  else{if(!p.ap.i){toast('先に社内確認が必要です');return;}p.ap.c=!p.ap.c;toast(p.ap.c?'クライアント確認しました。予約に進みます':'クライアント確認を取り消しました');}
+  save();render();
+  if(document.getElementById('ovD').classList.contains('show')&&DCUR)renderDetail();
+}
+let DCUR=null;
+function detailMedia(p){return p.media&&p.media.length?p.media:(p.img?[{t:'img',thumb:p.img}]:[]);}
+function openDetail(id){const p=store.posts.find(x=>x.id===id);if(!p)return;DCUR={p,i:0};renderDetail();document.getElementById('ovD').classList.add('show');}
+function renderDetail(){
+  const p=DCUR.p,dt=new Date(p.when),s=statusOf(p),media=detailMedia(p);
+  const cur=media[DCUR.i]||null,vid=cur&&cur.t==='vid';
+  const inner=(vid&&cur._url)?`<video src="${cur._url}" controls playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video>`:(vid?`<span class="mvid" style="font-size:32px">▶</span>`:'');
+  const big=`<div class="dprev" style="background-image:url('${cur?(cur.thumb||''):''}'),var(--ig2)"><span class="pfmt">${p.fmt}</span>${inner}</div>`;
+  const strip=media.length>1?`<div class="dstrip">${media.map((mm,j)=>`<div class="dthumb ${j===DCUR.i?'on':''}" style="background-image:url('${mm.thumb||''}'),var(--ig2)" onclick="selMedia(${j})">${mm.t==='vid'?'<span class="mvid">▶</span>':''}</div>`).join('')}</div>`:'';
+  const vnote=vid?'<div class="dhint" style="text-align:left;margin-top:8px">※ 動画はプレビュー用です。本番の投稿時にInstagramへアップロードされます。</div>':'';
+  const whenLabel=p.posted?'投稿':'予約';
+  const acts=(p.posted&&p.mt)
+    ? `<div class="dmetrics"><div><b>${fmtNum(p.mt.reach)}</b><span>リーチ</span></div><div><b>${fmtNum(p.mt.views)}</b><span>視聴</span></div><div><b>${fmtNum(p.mt.saves)}</b><span>保存</span></div><div><b>${fmtNum(p.mt.sends)}</b><span>シェア</span></div></div><div class="dhint">投稿済み。この投稿の実績です。</div>`
+    : `<div class="dacts">
+      <button class="ck ${p.ap.i?'done':''}" onclick="approve(${p.id},'i')">${p.ap.i?'✓ 社内確認済':'社内確認'}</button>
+      <button class="ck ${p.ap.c?'done':''}" onclick="approve(${p.id},'c')" ${!p.ap.i?'style="opacity:.4"':''}>${p.ap.c?'✓ クライアント確認済':'クライアント確認'}</button>
+    </div><div class="dhint">チェックはもう一度押すと取り消せます。</div>`;
+  document.getElementById('detailBody').innerHTML=`${big}${strip}
+    <div class="dt-theme">${esc(p.theme)}</div>
+    <div class="dt-when"><span class="nw">${dt.getFullYear()}/${dt.getMonth()+1}/${dt.getDate()} ${('0'+dt.getHours()).slice(-2)}:${('0'+dt.getMinutes()).slice(-2)} ${whenLabel}</span><span class="chip ${s.k}">${s.t}</span></div>
+    <div class="dt-cap">${p.cap?esc(p.cap):'<span style="color:var(--muted)">（キャプション未入力）</span>'}</div>${vnote}
+    ${acts}`;
+}
+function selMedia(j){if(DCUR){DCUR.i=j;renderDetail();}}
+function closeOvD(){DCUR=null;document.getElementById('ovD').classList.remove('show');}
+
+/* ===== CLIENT GUEST APPROVAL PORTAL ===== */
+let CLIENT_PREVIEW=false;
+function openShare(){document.getElementById('shareLink').value=location.href.split('#')[0]+'#review';document.getElementById('ovS').classList.add('show');}
+function closeOvS(){document.getElementById('ovS').classList.remove('show');}
+function copyShareLink(){const i=document.getElementById('shareLink');i.select();try{navigator.clipboard.writeText(i.value);}catch(e){}toast('リンクをコピーしました。クライアントに共有してください');}
+function openClientView(preview){CLIENT_PREVIEW=!!preview;closeOvS();renderClientView();document.getElementById('cvClose').style.display=CLIENT_PREVIEW?'block':'none';document.getElementById('ovC').classList.add('show');}
+function closeClientView(){document.getElementById('ovC').classList.remove('show');}
+function renderClientView(){
+  const pend=store.posts.filter(p=>!p.posted&&p.ap.i&&!p.ap.c).sort((a,b)=>a.when<b.when?-1:1);
+  const body=document.getElementById('cvBody');
+  let h=CLIENT_PREVIEW?`<div style="background:#161b26;color:#fff;border-radius:12px;padding:10px 14px;font-size:12px;text-align:center;margin-bottom:18px">運用者プレビュー — クライアントにはこの画面だけが表示されます</div>`:'';
+  h+=`<div class="cvhead"><div class="cvlogo">G</div><h2>投稿内容のご確認</h2>
+    <p>@your_brand の運用担当より。下記の投稿をご確認ください。<br>問題なければ「承認」、ご要望があれば「修正を依頼」を押してください。</p></div>`;
+  if(!pend.length){body.innerHTML=h+`<div class="cdone"><div class="big">🎉</div>確認をお願いする投稿はありません。<br>ありがとうございます。</div>`;return;}
+  h+=`<div style="text-align:center"><span class="cvcount">確認待ち ${pend.length}件</span></div>`;
+  h+=pend.map(p=>{const dt=new Date(p.when),media=detailMedia(p),m0=media[0];
+    return `<div class="ccard">
+      <div class="cimg" style="background-image:url('${m0?(m0.thumb||''):''}'),var(--ig2)">${m0&&m0.t==='vid'?'<span class="mvid" style="font-size:36px">▶</span>':''}${media.length>1?`<span class="mcnt">1/${media.length}</span>`:''}</div>
+      <div class="cbody">
+        <div class="ctheme">${esc(p.theme)}</div>
+        <div class="cmeta"><span class="fmtb">${p.fmt}</span> <span class="nw">${dt.getMonth()+1}月${dt.getDate()}日 ${('0'+dt.getHours()).slice(-2)}:${('0'+dt.getMinutes()).slice(-2)} 投稿予定</span></div>
+        <div class="ccap">${p.cap?esc(p.cap):'<span style="color:var(--muted)">（キャプションなし）</span>'}</div>
+        ${p.needsFix&&p.note?`<div style="font-size:12px;color:var(--warn);margin-top:11px">前回の修正依頼：${esc(p.note)}</div>`:''}
+        <div class="cacts">
+          <button class="cbtn ok" onclick="clientApprove(${p.id})">✓ 承認する</button>
+          <button class="cbtn fixb" onclick="toggleFix(${p.id})">修正を依頼</button>
+        </div>
+        <div class="cfix" id="fix-${p.id}">
+          <textarea id="fixt-${p.id}" placeholder="修正してほしい点をご記入ください（例：写真を別のものに／文言を〜に変更）">${p.note?esc(p.note):''}</textarea>
+          <div class="row"><button class="btn ghost sm" onclick="toggleFix(${p.id})">キャンセル</button><button class="btn ig sm" onclick="clientFix(${p.id})">依頼を送信</button></div>
+        </div>
+      </div></div>`;}).join('');
+  h+=`<div style="text-align:center;font-size:11px;color:var(--muted);margin-top:10px">提供：@your_brand 運用チーム ／ GROW Suite</div>`;
+  body.innerHTML=h;
+}
+function clientApprove(id){const p=store.posts.find(x=>x.id===id);if(!p)return;p.ap.c=true;p.needsFix=false;save();renderClientView();render();toast('承認いただきありがとうございます');}
+function toggleFix(id){const el=document.getElementById('fix-'+id);if(el)el.style.display=el.style.display==='block'?'none':'block';}
+function clientFix(id){const p=store.posts.find(x=>x.id===id);if(!p)return;p.note=document.getElementById('fixt-'+id).value.trim()||'修正希望';p.needsFix=true;save();renderClientView();render();toast('修正依頼を送信しました');}
+
+/* ===== GROWTH ===== */
+function renderGrowth(m){
+  const lastSnap=store.snaps[store.snaps.length-1],postCount=store.posts.filter(p=>p.posted).length,aud=store.audience||{following:0,age:[],gender:{f:50,m:50}};
+  m.innerHTML=`<div class="view">
+    <div class="ph"><h2>成長</h2><div class="gr"></div>
+      <div class="seg" id="seg"><button data-p="month" class="${period==='month'?'on':''}">今月</button><button data-p="all" class="${period==='all'?'on':''}">開始時から</button></div>
+      <button class="btn ig" style="margin-left:10px" onclick="doRefresh()">更新</button>
+      <button class="btn ghost" style="margin-left:8px" onclick="openGrowth()">手入力</button></div>
+    <div class="psub">伸びているかが一発で分かる。各数字にマウスを重ねると「どの投稿が効いたか」まで見えます。</div>
+    <div class="phead">
+      <div class="pav">G</div>
+      <div class="pinfo">
+        <div class="pname">your_brand <span class="pverif">✔</span></div>
+        <div class="phandle">@your_brand</div>
+        <div class="pbio">日々の運用を、抜け漏れゼロで。数字で伸びを証明します。</div>
+      </div>
+      <div class="pstats">
+        <div class="pstat"><b>${fmtNum(postCount)}</b><span>投稿</span></div>
+        <div class="pstat"><b>${fmtNum(lastSnap.foll)}</b><span>フォロワー</span></div>
+        <div class="pstat"><b>${fmtNum(aud.following)}</b><span>フォロー</span></div>
+      </div>
+    </div>
+    <div class="hero">
+      <div>
+        <div class="herol">
+          <div><div class="lab">フォロワー</div><div class="big" id="hFoll">0</div>
+            <div class="since" id="hSince"></div><div class="growpill" id="hGrow"></div></div>
+          <div class="ring" id="hRing"><div class="rc"><div class="rv" id="hRingV">–</div><div class="rl">好調度</div></div></div>
+        </div>
+        <div class="health" id="hHealth"></div>
+      </div>
+      <div class="chartwrap"><div class="ct"><b>フォロワー推移</b><span id="cRange"></span></div>
+        <div class="chartarea" id="chartarea"><svg class="chart" id="chart" viewBox="0 0 600 170" preserveAspectRatio="none"></svg>
+          <div class="cguide" id="cguide"></div><div class="ctip" id="ctip"></div></div></div>
+    </div>
+    <div class="grid5" id="metrics"></div>
+    <div class="cols">
+      <div class="panel"><h3>伸びてる投稿</h3><div class="sub">リーチが大きい順＝何が効いてるか一目</div><div id="topPosts"></div></div>
+      <div class="panel"><h3>形式別パフォーマンス</h3><div class="sub">1投稿あたりの平均リーチ</div><div class="fbar" id="fbar"></div><div class="note" id="fnote"></div></div>
+    </div>
+    <div class="aud">
+      <div class="panel"><h3>オーディエンス：年齢層</h3><div class="sub">フォロワーの年齢分布</div>
+        <div id="ageBars">${aud.age.map(a=>`<div class="agebar"><div class="agn">${a[0]}</div><div class="aget"><div class="agef" data-w="${a[1]}"></div></div><div class="agv">${a[1]}%</div></div>`).join('')}</div></div>
+      <div class="panel"><h3>性別</h3><div class="sub">フォロワーの男女比</div>
+        <div class="genderwrap">
+          <div class="gdonut2">
+            ${(()=>{const f=aud.gender.f,C=289,g=22,fLen=C*f/100-g,mLen=C*(100-f)/100-g,fStart=g/2,mStart=C*f/100+g/2;return `<svg class="gsvg" viewBox="0 0 120 120">
+              <defs>
+                <linearGradient id="ggf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f9ce34"/><stop offset="0.5" stop-color="#fb5d3b"/><stop offset="1" stop-color="#ee2a7b"/></linearGradient>
+                <linearGradient id="ggm" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#6622d6"/><stop offset="0.5" stop-color="#4f5bd5"/><stop offset="1" stop-color="#36a8f5"/></linearGradient>
+              </defs>
+              <circle cx="60" cy="60" r="46" fill="none" stroke="#eef0f6" stroke-width="14"/>
+              <circle cx="60" cy="60" r="46" fill="none" stroke="url(#ggf)" stroke-width="14" stroke-linecap="round" stroke-dasharray="${fLen.toFixed(1)} ${C}" stroke-dashoffset="${(-fStart).toFixed(1)}" transform="rotate(-90 60 60)"/>
+              <circle cx="60" cy="60" r="46" fill="none" stroke="url(#ggm)" stroke-width="14" stroke-linecap="round" stroke-dasharray="${mLen.toFixed(1)} ${C}" stroke-dashoffset="${(-mStart).toFixed(1)}" transform="rotate(-90 60 60)"/>
+            </svg>`;})()}
+            <div class="gdc"><b>${Math.max(aud.gender.f,aud.gender.m)}%</b><span>${aud.gender.f>=aud.gender.m?'女性':'男性'}</span></div>
+          </div>
+          <div class="glegend2">
+            <div class="gl"><span class="gdot" style="background:linear-gradient(135deg,#fb5d3b,#ee2a7b)"></span><div class="gv"><b>${aud.gender.f}%</b><span>女性</span></div></div>
+            <div class="gl"><span class="gdot" style="background:linear-gradient(135deg,#4f5bd5,#36a8f5)"></span><div class="gv"><b>${aud.gender.m}%</b><span>男性</span></div></div>
+          </div>
+        </div>
+        <div class="note">${(()=>{const t=aud.age.slice().sort((a,b)=>b[1]-a[1])[0];return t?`最も多いのは ${t[0]}（${t[1]}%）。この層に刺さる企画が伸びやすい。`:'';})()}</div></div>
+    </div>
+    <div class="panel datainfo">
+      <div class="abk">データの取得方法</div>
+      <dl class="spec">
+        <div class="srow"><dt>自動取得（推奨）</dt><dd>Instagram公式APIから数値を取得します。<b>公式APIの利用は無料</b>（API利用料・従量課金はありません）。毎日決まった時刻の自動更新も設定できます。</dd></div>
+        <div class="srow"><dt>「更新」ボタン</dt><dd>押した時点の最新数値を取得します。いつでも手動で更新できます。</dd></div>
+        <div class="srow"><dt>手入力でも可</dt><dd>API連携を使わず、数値を直接入力する運用もできます（連携前・オフラインでも使えます）。</dd></div>
+        <div class="srow"><dt>費用の注意</dt><dd>公式APIは無料です。第三者のデータ代行サービスを使う場合のみ有料（月額）になりますが、本ツールは公式APIを使うため取得自体に費用はかかりません。</dd></div>
+      </dl>
+    </div>
+  </div>`;
+  document.getElementById('seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;period=b.dataset.p;renderGrowth(m);});
+  drawGrowth();
+}
+function drawGrowth(){
+  const s=store.snaps,last=s[s.length-1],monthKey=last.d.slice(0,7);
+  let scoped=period==='month'?s.filter(x=>x.d.slice(0,7)===monthKey):s;
+  if(scoped.length<2)scoped=s;
+  const base=scoped[0],periodLabel=period==='month'?'今月':'開始時比';
+  countUp(document.getElementById('hFoll'),last.foll,v=>fmtNum(v));
+  document.getElementById('hSince').innerHTML=`${base.d.slice(5)} ${fmtNum(base.foll)} → ${last.d.slice(5)} ${fmtNum(last.foll)} <b style="color:${(last.foll-base.foll)>=0?'#15a566':'#e0506b'}">${(last.foll-base.foll)>=0?'+':''}${fmtNum(last.foll-base.foll)}人</b>`;
+  const g=delta(last.foll,base.foll),gp=document.getElementById('hGrow');
+  gp.className='growpill'+(g<0?' dn':'');
+  gp.innerHTML=`${g>=0?'▲':'▼'} ${pct(g)} <span style="font-weight:600;font-size:12px;opacity:.8">（${periodLabel}）</span>`;
+  const ups=['reach','views','sends','save'].filter(k=>delta(last[k],base[k])>0).length;
+  const h=ups>=3?['好調','#15a566']:ups>=2?['順調','#d98324']:['要注意','#e0506b'];
+  const dotS=`width:10px;height:10px;border-radius:50%;background:${h[1]};display:inline-block;vertical-align:-1px;margin-right:6px`;
+  document.getElementById('hHealth').innerHTML=`<span class="nw"><span style="${dotS}"></span>調子：<b style="color:${h[1]}">${h[0]}</b></span><span class="nw">（主要指標 ${ups}/4 が${periodLabel}で上昇）</span>`;
+  const hp=Math.round(ups/4*100),ring=document.getElementById('hRing');
+  if(ring){ring.style.setProperty('--p',hp+'%');document.getElementById('hRingV').textContent=hp+'%';}
+  drawChart(scoped.map(x=>x.foll),scoped.map(x=>x.d.slice(5)),scoped.map(x=>x.d));
+  document.getElementById('cRange').textContent=`${base.d.slice(5)} 〜 ${last.d.slice(5)}`;
+  const startIdx=s.indexOf(scoped[0]),prevWin=startIdx>0?s.slice(Math.max(0,startIdx-scoped.length),startIdx):[];
+  const sumK=(a,k)=>a.reduce((t,x)=>t+x[k],0),avgK=(a,k)=>a.length?sumK(a,k)/a.length:0;
+  const agg=(k,rate)=>{const cur=rate?avgK(scoped,k):sumK(scoped,k),pv=prevWin.length?(rate?avgK(prevWin,k):sumK(prevWin,k)):null;return{cur,d:pv!=null?delta(cur,pv):null};};
+  const aV=agg('views',0),aR=agg('reach',0),aS=agg('sends',0),aN=agg('nf',1),aSv=agg('save',1);
+  const MD=[
+    {n:'視聴',basis:'合計',v:fmtNum(aV.cur),d:aV.d,s:scoped.map(x=>x.views),drill:'views'},
+    {n:'リーチ',basis:'合計',v:fmtNum(aR.cur),d:aR.d,s:scoped.map(x=>x.reach),drill:'reach'},
+    {n:'非フォロワー比',basis:'平均',v:aN.cur.toFixed(0)+'%',d:aN.d,s:scoped.map(x=>x.nf),drill:null},
+    {n:'送信/シェア',basis:'合計',v:fmtNum(aS.cur),d:aS.d,s:scoped.map(x=>x.sends),drill:'sends'},
+    {n:'保存率',basis:'平均',v:aSv.cur.toFixed(1)+'%',d:aSv.d,s:scoped.map(x=>x.save),drill:'saverate'},
+  ];
+  document.getElementById('metrics').innerHTML=MD.map(x=>{
+    const up=x.d==null?true:x.d>=0;
+    const dchip=x.d==null?`<span class="delta" style="background:#eef0f6;color:#9aa1b2">${period==='month'?'前月比なし':'全期間'}</span>`:`<span class="delta ${up?'up':'dn'}">${up?'▲':'▼'} ${pct(x.d)}</span>`;
+    return `<div class="m"><div class="mn">${x.n}<span style="font-size:9.5px;color:#b9bfcd;font-weight:500"> ${x.basis}</span></div><div class="mv">${x.v}</div>
+      ${dchip}${spark(x.s,up)}
+      <div class="mhint">${x.drill?'マウスで投稿別を表示':'アカウント全体の指標'}</div>
+      <div class="pop">${popHTML(x.drill)}</div></div>`;}).join('');
+  const postsAll=store.posts.filter(p=>p.posted&&p.mt);
+  const posts=period==='month'?postsAll.filter(p=>p.when.slice(0,7)===monthKey):postsAll;
+  const tp=[...posts].sort((a,b)=>b.mt.reach-a.mt.reach).slice(0,4);
+  document.getElementById('topPosts').innerHTML=tp.length?tp.map((p,i)=>`<div class="post">
+    <div class="thumb rkw" style="background-image:url('${mediaThumb(p)}'),var(--ig2)"><div class="rk">${i+1}</div>${mediaOverlay(p)}</div>
+    <div class="pi"><div class="pt">${esc(p.theme)}</div><div class="pm"><span class="fmtb">${p.fmt}</span> 保存 ${fmtNum(p.mt.saves)}・シェア ${fmtNum(p.mt.sends)}</div></div>
+    <div class="pr"><b>${fmtNum(p.mt.reach)}</b><span>リーチ</span></div></div>`).join(''):`<div class="empty">この期間の投稿はありません</div>`;
+  const fmts=['リール','カルーセル','フィード'];
+  const avg=f=>{const a=posts.filter(p=>p.fmt===f);return a.length?a.reduce((s2,p)=>s2+p.mt.reach,0)/a.length:0;};
+  const vals=fmts.map(avg),mx=Math.max(1,...vals);
+  document.getElementById('fbar').innerHTML=fmts.map((f,i)=>`<div class="fb"><div class="fn">${f}</div><div class="ftrack"><div class="ffill" data-w="${vals[i]/mx*100}"></div></div><div class="fv">${fmtNum(vals[i])}</div></div>`).join('');
+  requestAnimationFrame(()=>document.querySelectorAll('.ffill,.agef').forEach(e=>e.style.width=e.dataset.w+'%'));
+  const best=fmts[vals.indexOf(Math.max(...vals))];
+  document.getElementById('fnote').textContent=`${period==='month'?'今月、':''}このアカウントでは「${best}」が最も伸びています。中〜大アカウントはカルーセルがリールに勝つことも多く、形式は思い込みでなく数字で判断するのが正解です。`;
+}
+let CHART=null;
+function drawChart(vals,labels,dates){
+  CHART={vals,labels,dates};
+  const W=600,H=170,pt=14,bottom=H-22,mn=Math.min(...vals)*0.985,mx=Math.max(...vals)*1.01;
+  const X=i=>pt+i*(W-pt*2)/(vals.length-1),Y=v=>bottom-(v-mn)/(mx-mn)*(bottom-pt);
+  const pts=vals.map((v,i)=>[X(i),Y(v)]);
+  const line='M'+pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L');
+  const area=line+` L${X(vals.length-1).toFixed(1)} ${bottom} L${pt} ${bottom} Z`;
+  const dots=pts.map(p=>`<circle class="dot" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4"/>`).join('');
+  const xl=labels.map((l,i)=>i%2===0?`<text class="xlab" x="${X(i).toFixed(1)}" y="${H-4}" text-anchor="middle">${l}</text>`:'').join('');
+  document.getElementById('chart').innerHTML=`<defs>
+    <linearGradient id="gl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f9ce34"/><stop offset="0.5" stop-color="#ee2a7b"/><stop offset="1" stop-color="#6228d7"/></linearGradient>
+    <linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ee2a7b" stop-opacity="0.18"/><stop offset="1" stop-color="#ee2a7b" stop-opacity="0"/></linearGradient></defs>
+    <path d="${area}" fill="url(#ga)" stroke="none" style="opacity:0;animation:pop .8s 1s forwards"/>
+    <path class="ln" d="${line}"/>${dots}${xl}`;
+  bindChartHover();
+}
+function bindChartHover(){
+  const area=document.getElementById('chartarea');if(!area||!CHART)return;
+  const guide=document.getElementById('cguide'),tip=document.getElementById('ctip');
+  area.onmousemove=e=>{
+    const r=area.getBoundingClientRect(),pad=14/600,n=CHART.vals.length;
+    let t=((e.clientX-r.left)/r.width-pad)/(1-2*pad);t=Math.max(0,Math.min(1,t));
+    const idx=Math.round(t*(n-1)),px=(pad+(n>1?idx/(n-1):0)*(1-2*pad))*r.width;
+    guide.style.display='block';guide.style.left=px+'px';
+    tip.style.display='block';tip.innerHTML=`<b>${fmtNum(CHART.vals[idx])}</b>人<span>${CHART.dates[idx]}</span>`;
+    let tl=px-tip.offsetWidth/2;tl=Math.max(0,Math.min(r.width-tip.offsetWidth,tl));tip.style.left=tl+'px';
+  };
+  area.onmouseleave=()=>{guide.style.display='none';tip.style.display='none';};
+}
+function popHTML(drill){
+  const monthKey=store.snaps[store.snaps.length-1].d.slice(0,7);
+  let ps=store.posts.filter(p=>p.posted&&p.mt);
+  if(period==='month')ps=ps.filter(p=>p.when.slice(0,7)===monthKey);
+  if(!ps.length)return `<div class="popt">この期間の投稿データがありません</div>`;
+  if(!drill)return `<div class="popt">アカウント全体の指標です</div><div class="popnote">投稿ごとの内訳は「リーチ」「視聴」などでご確認ください。</div>`;
+  if(drill==='saverate'){
+    const rows=ps.map(p=>({t:p.theme,v:p.mt.reach?p.mt.saves/p.mt.reach*100:0})).sort((a,b)=>b.v-a.v).slice(0,6);
+    return `<div class="popt">投稿別の保存率</div>`+rows.map(r=>`<div class="poprow"><span>${esc(r.t)}</span><b>${r.v.toFixed(1)}%</b></div>`).join('')+
+      `<div class="popnote">保存率が高い投稿＝「役に立つ」と判断された証拠。次はこの型を増やす。${ps.length>6?`（上位6件表示）`:''}</div>`;
+  }
+  const lab={views:'視聴',reach:'リーチ',sends:'シェア'}[drill]||drill;
+  const tot=ps.reduce((a,p)=>a+(p.mt[drill]||0),0)||1;
+  const rows=ps.map(p=>({t:p.theme,v:p.mt[drill]||0})).sort((a,b)=>b.v-a.v);
+  return `<div class="popt">投稿別の${lab}</div>`+rows.map(r=>`<div class="poprow"><span>${esc(r.t)}</span><b>${fmtNum(r.v)}</b><i>${Math.round(r.v/tot*100)}%</i></div>`).join('')+
+    `<div class="popnote">最も効いたのは「${esc(rows[0].t)}」。次の企画はこれに寄せる。${ps.length>6?`（上位6件表示／全${ps.length}件）`:''}</div>`;
+}
+function doRefresh(){
+  const s=store.snaps,last=s[s.length-1],g=v=>Math.round(v*(1.01+Math.random()*0.035));
+  const d=new Date(last.d);d.setDate(d.getDate()+7);
+  const nd=`${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
+  store.snaps.push({d:nd,foll:g(last.foll),reach:g(last.reach),views:g(last.views),nf:Math.min(80,last.nf+Math.round(Math.random()*2)),sends:g(last.sends),save:+(last.save+Math.random()*0.1).toFixed(1)});
+  save();renderGrowth(document.getElementById('main'));
+  toast('最新データを取得しました（API自動取得をシミュレート）');
+}
+function spark(vals,up){
+  const W=120,H=24,mn=Math.min(...vals),mx=Math.max(...vals);
+  const p=vals.map((v,i)=>`${(i*W/(vals.length-1)).toFixed(1)},${(H-2-(mx===mn?H/2:(v-mn)/(mx-mn)*(H-4))).toFixed(1)}`).join(' ');
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="M${p.replace(/ /g,' L')}" style="stroke:${up?'#15a566':'#e0506b'}"/></svg>`;
+}
+function countUp(el,to,fmt){const dur=900,t0=performance.now();function step(t){const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);el.textContent=fmt(to*e);if(k<1)requestAnimationFrame(step);}requestAnimationFrame(step);}
+
+/* ===== CLIENT REPORT ===== */
+function reportChart(vals){
+  const W=600,H=150,pt=10,bottom=H-8,mn=Math.min(...vals)*0.985,mx=Math.max(...vals)*1.01;
+  const X=i=>pt+i*(W-pt*2)/(vals.length-1),Y=v=>bottom-(v-mn)/((mx-mn)||1)*(bottom-14);
+  const pts=vals.map((v,i)=>[X(i),Y(v)]);
+  const line='M'+pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L');
+  const area=line+` L${X(vals.length-1).toFixed(1)} ${bottom} L${pt} ${bottom} Z`;
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:150px"><defs>
+    <linearGradient id="rgl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f9ce34"/><stop offset="0.5" stop-color="#ee2a7b"/><stop offset="1" stop-color="#6228d7"/></linearGradient>
+    <linearGradient id="rga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ee2a7b" stop-opacity="0.16"/><stop offset="1" stop-color="#ee2a7b" stop-opacity="0"/></linearGradient></defs>
+    <path d="${area}" fill="url(#rga)"/><path d="${line}" fill="none" stroke="url(#rgl)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+function renderReport(m){
+  const s=store.snaps,last=s[s.length-1],prev=s[s.length-2],monthKey=last.d.slice(0,7);
+  let scoped=period==='month'?s.filter(x=>x.d.slice(0,7)===monthKey):s;
+  if(scoped.length<2)scoped=s;
+  const first=scoped[0],base=scoped[0];
+  const g=delta(last.foll,base.foll),periodLabel=period==='month'?'今月':'開始時から';
+  const M=[['リーチ',fmtNum(last.reach),delta(last.reach,prev.reach)],['視聴',fmtNum(last.views),delta(last.views,prev.views)],['送信・シェア',fmtNum(last.sends),delta(last.sends,prev.sends)],['保存率',last.save.toFixed(1)+'%',delta(last.save,prev.save)]];
+  const postsAll=store.posts.filter(p=>p.posted&&p.mt);
+  const posts=period==='month'?postsAll.filter(p=>p.when.slice(0,7)===monthKey):postsAll;
+  const best=[...posts].sort((a,b)=>b.mt.reach-a.mt.reach).slice(0,3);
+  const fmts=['リール','カルーセル','フィード'],avg=f=>{const a=posts.filter(p=>p.fmt===f);return a.length?a.reduce((x,p)=>x+p.mt.reach,0)/a.length:0;};
+  const bf=fmts.map(f=>[f,avg(f)]).sort((a,b)=>b[1]-a[1])[0],topPost=best[0];
+  const next=[];
+  if(bf&&bf[1]>0)next.push(`形式は<b>「${bf[0]}」</b>が最も伸びています。次の期間も主軸に据えるのが効果的です。`);
+  if(topPost)next.push(`<b>「${esc(topPost.theme)}」</b>が最大リーチ（${fmtNum(topPost.mt.reach)}）。同じテーマ・構成の横展開を推奨します。`);
+  next.push(g>=0?`フォロワーは${periodLabel}で<b>${pct(g)}</b>。現状の方針は機能しています。継続を推奨します。`:`フォロワーの伸びが鈍化しています（${pct(g)}）。投稿頻度と形式の見直しを推奨します。`);
+  m.innerHTML=`<div class="view report">
+    <div class="rtools">
+      <div class="seg" id="segR"><button data-p="month" class="${period==='month'?'on':''}">今月</button><button data-p="all" class="${period==='all'?'on':''}">開始時から</button></div>
+      <div style="flex:1"></div>
+      <button class="btn ig" onclick="window.print()">印刷 / PDFで保存</button>
+    </div>
+    <div class="rpaper">
+      <div class="rhead"><div class="rlogo">G</div>
+        <div class="rh"><div class="rt">Instagram 成長レポート</div><div class="rs">@your_brand</div></div>
+        <div class="rp">対象期間<br>${first.d} 〜 ${last.d}</div></div>
+      <div class="rhero">
+        <div><div class="rlab">フォロワー（現在）</div><div class="rbig">${fmtNum(last.foll)}</div></div>
+        <div class="rgrow ${g<0?'dn':''}">${g>=0?'▲':'▼'} ${pct(g)} <span style="font-weight:600;font-size:12px;opacity:.8">（${periodLabel}）</span></div>
+      </div>
+      <div class="rlead">${g>=0?`この期間、アカウントは着実に伸びています。${fmtNum(base.foll)} から ${fmtNum(last.foll)} へ（${pct(g)}）。主要指標も下記の通り改善しています。`:`この期間はフォロワーの伸びが鈍化しました。下記の指標と次の打ち手をご確認ください。`}</div>
+      <div class="rcallouts">
+        <div class="rco"><div class="rcl">フォロワー増加（${periodLabel}）</div><div class="rcv" style="color:${(last.foll-base.foll)>=0?'#15a566':'#e0506b'}">${((last.foll-base.foll)>=0?'+':'')+fmtNum(last.foll-base.foll)}</div><div class="rcs">${fmtNum(base.foll)} → ${fmtNum(last.foll)}</div></div>
+        <div class="rco"><div class="rcl">リーチ成長</div><div class="rcv">${pct(delta(last.reach,base.reach))}</div><div class="rcs">${fmtNum(base.reach)} → ${fmtNum(last.reach)}</div></div>
+        <div class="rco"><div class="rcl">最高リーチ投稿</div><div class="rcv">${topPost?fmtNum(topPost.mt.reach):'–'}</div><div class="rcs">${topPost?esc(topPost.theme):'—'}</div></div>
+      </div>
+      <div class="rsec">フォロワー推移</div>
+      ${reportChart(scoped.map(x=>x.foll))}
+      <div style="font-size:10.5px;color:var(--muted);margin-top:6px">データ：Instagramインサイト ／ 対象期間 ${first.d} 〜 ${last.d}（${scoped.length}計測点）</div>
+      <div class="rsec">主要指標（前週比）</div>
+      <div class="rmetrics">${M.map(x=>{const up=x[2]>=0;return `<div class="rmcard"><div class="rmn">${x[0]}</div><div class="rmv">${x[1]}</div><span class="delta ${up?'up':'dn'}">${up?'▲':'▼'} ${pct(x[2])}</span></div>`;}).join('')}</div>
+      <div class="rsec">伸びた投稿 トップ3</div>
+      <div class="rbest">${best.map((p,i)=>`<div class="rbpost"><div class="rbthumb" style="background-image:url('${mediaThumb(p)}'),var(--ig2)"><div class="rbrank">${i+1}</div></div><div class="rbi"><div class="rbt">${esc(p.theme)}</div><div class="rbm">${p.fmt}・保存 ${fmtNum(p.mt.saves)}・シェア ${fmtNum(p.mt.sends)}</div></div><div class="rbr"><b>${fmtNum(p.mt.reach)}</b><span>リーチ</span></div></div>`).join('')}</div>
+      <div class="rsec">次の打ち手</div>
+      <div class="rnext">${next.map(n=>`<div class="rnl"><span>—</span><div>${n}</div></div>`).join('')}</div>
+      <div class="rfoot"><span>本レポートは GROW Suite が生成しました。</span><span>${last.d} 時点</span></div>
+    </div></div>`;
+  document.getElementById('segR').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;period=b.dataset.p;renderReport(m);});
+}
+
+/* ===== ABOUT ===== */
+function renderAbout(m){
+  m.innerHTML=`<div class="view about2">
+    <div class="abhead">
+      <div class="kick">ABOUT</div>
+      <h2>このツールについて</h2>
+      <p class="alead">「投稿を管理する」だけのツールではありません。Instagramで実際に結果を出すために、運用者が押さえるべき原則を、そのまま設計に落とし込んでいます。</p>
+    </div>
+    <section class="abs">
+      <div class="abk">設計の考え方</div>
+      <ol class="prin">
+        <li><span class="no">01</span><div><b>抜け漏れは、仕組みで防ぐ</b><p>誰が運用しても作り忘れ・投稿忘れが残らないよう、カレンダーと二段階の承認で押さえます。属人化させません。</p></div></li>
+        <li><span class="no">02</span><div><b>伸びは、数字で示す</b><p>感覚ではなく成長率で語る。クライアントに「伸びている」と証明できる状態を、運用の標準にします。</p></div></li>
+        <li><span class="no">03</span><div><b>形式は、データで選ぶ</b><p>リールが常に最適とは限りません。形式ごとの実数を見て、次に何を出すかを判断します。</p></div></li>
+        <li><span class="no">04</span><div><b>指標は、拡散を見る</b><p>「いいね」の数ではなく、リーチ・保存・シェアといった広がる動きを中心に据えています。</p></div></li>
+      </ol>
+    </section>
+    <section class="abs">
+      <div class="abk">クライアント確認ポータル</div>
+      <p style="font-size:13.5px;color:#39404f;line-height:1.95;margin:10px 0 16px">投稿を任せているクライアントには、<b>ログイン不要の専用リンク</b>を発行できます。リンクを開くと運用画面は一切見えず、<b>確認待ちの投稿だけ</b>が表示され、その場で「承認」または「修正依頼」ができます。結果は運用者の管理画面に即反映。運用ツールを触らせる必要はありません。</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn ig" onclick="openClientView(true)">クライアントが見る画面をプレビュー</button>
+        <button class="btn ghost" onclick="openShare()">確認リンクの発行を見る</button>
+      </div>
+    </section>
+    <section class="abs">
+      <div class="abk">導入について</div>
+      <dl class="spec">
+        <div class="srow"><dt>対象アカウント</dt><dd>ビジネス／クリエイター（自動投稿に必要です）。</dd></div>
+        <div class="srow"><dt>自動投稿できる形式</dt><dd>写真・カルーセル・リール。</dd></div>
+        <div class="srow"><dt>ストーリーズ</dt><dd>仕様上、自動投稿はできません。予約時刻にリマインドでお知らせします。</dd></div>
+        <div class="srow"><dt>接続キーの管理</dt><dd>当方が自動で更新し続けます。再操作をお願いするのは、パスワード変更・連携解除のときだけです。</dd></div>
+        <div class="srow"><dt>はじめの連携</dt><dd>初回に一度、接続を許可いただくだけで完了します。</dd></div>
+      </dl>
+      <p class="abfoot">本デモは動作のシミュレーションです。実際のInstagramへの投稿は行いません。本番導入では、上記の前提のもとで自動投稿を実装します（運用ガイドは別途お渡しします）。</p>
+    </section>
+  </div>`;
+}
+
+/* ===== modals ===== */
+/* ---- media (images + video) ---- */
+let MEDIA=[];
+function mediaThumb(p){return p.media&&p.media.length?(p.media[0].thumb||''):(p.img||'');}
+function mediaOverlay(p){
+  if(!p.media||!p.media.length)return p.img?'':'';
+  const vid=p.media[0].t==='vid'?'<span class="mvid">▶</span>':'';
+  const cnt=p.media.length>1?`<span class="mcnt">${p.media.length}</span>`:'';
+  return vid+cnt;
+}
+function downscale(dataURL,cb){
+  const im=new Image();
+  im.onload=()=>{const mx=1000,sc=Math.min(1,mx/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',0.82));};
+  im.onerror=()=>cb(dataURL);im.src=dataURL;
+}
+function capturePoster(url,cb){
+  const v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='metadata';let done=false;
+  const fin=d=>{if(done)return;done=true;cb(d);};
+  v.onloadeddata=()=>{try{v.currentTime=Math.min(0.1,(v.duration||1)*0.1);}catch(e){fin(null);}};
+  v.onseeked=()=>{try{const sc=Math.min(1,1000/Math.max(v.videoWidth||640,v.videoHeight||640));const c=document.createElement('canvas');c.width=Math.round((v.videoWidth||640)*sc);c.height=Math.round((v.videoHeight||640)*sc);c.getContext('2d').drawImage(v,0,0,c.width,c.height);fin(c.toDataURL('image/jpeg',0.8));}catch(e){fin(null);}};
+  v.onerror=()=>fin(null);setTimeout(()=>fin(null),4000);v.src=url;
+}
+function onPickMedia(e){
+  const files=[...e.target.files];e.target.value='';
+  files.forEach(f=>{
+    if(MEDIA.length>=10){toast('メディアは最大10件までです');return;}
+    if(f.type.startsWith('image/')){const r=new FileReader();r.onload=ev=>downscale(ev.target.result,d=>{MEDIA.push({t:'img',thumb:d});renderMediaThumbs();});r.readAsDataURL(f);}
+    else if(f.type.startsWith('video/')){const url=URL.createObjectURL(f);capturePoster(url,poster=>{MEDIA.push({t:'vid',thumb:poster,name:f.name,_url:url});renderMediaThumbs();});}
+    else toast('画像か動画を選んでください');
+  });
+}
+function renderMediaThumbs(){
+  document.getElementById('m_thumbs').innerHTML=MEDIA.map((m,i)=>`<div class="mth" style="background-image:url('${m.thumb||''}'),var(--ig2)">${m.t==='vid'?'<span class="mvid">▶</span>':''}<button class="x" onclick="rmMedia(${i})">×</button></div>`).join('');
+}
+function rmMedia(i){MEDIA.splice(i,1);renderMediaThumbs();}
+
+function openPost(anchor){
+  document.getElementById('m_theme').value='';document.getElementById('m_cap').value='';
+  document.getElementById('m_date').value=TODAY;document.getElementById('m_time').value='19:00';
+  document.querySelectorAll('#m_fmt .fmtopt').forEach((o,i)=>o.classList.toggle('on',i===0));
+  document.getElementById('storyHint').style.display='none';
+  document.getElementById('m_when').textContent='';
+  document.getElementById('recSlots').innerHTML=TOPSLOTS.map(t=>`<span class="btchip" style="cursor:pointer" onclick="applySlot(${t.di},'${BUCKETS[t.bi][1]}')">${HDAYS[t.di]} ${BUCKETS[t.bi][1]}</span>`).join('');
+  MEDIA=[];renderMediaThumbs();
+  const ov=document.getElementById('ov'),modal=ov.querySelector('.modal');
+  if(anchor){
+    ov.classList.add('anchored');
+    const mw=440;let left=Math.max(12,Math.min(anchor.x,window.innerWidth-mw-16));
+    let top=Math.max(12,Math.min(anchor.y-40,window.innerHeight-520));
+    modal.style.position='absolute';modal.style.left=left+'px';modal.style.top=top+'px';modal.style.margin='0';
+  }else{
+    ov.classList.remove('anchored');modal.style.position='';modal.style.left='';modal.style.top='';modal.style.margin='';
+  }
+  ov.classList.add('show');
+}
+function applySlot(di,time){
+  const jsDay=(di+1)%7,base=document.getElementById('m_date').value||TODAY;
+  const d=new Date(base+'T00:00');let i=0;while(d.getDay()!==jsDay&&i<8){d.setDate(d.getDate()+1);i++;}
+  document.getElementById('m_date').value=`${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
+  document.getElementById('m_time').value=time;
+  toast(`${HDAYS[di]} ${time} に設定しました`);
+}
+function openPostOn(ds,ev){
+  openPost(ev?{x:ev.clientX+10,y:ev.clientY}:null);
+  if(ds){document.getElementById('m_date').value=ds;
+    const d=new Date(ds+'T00:00');document.getElementById('m_when').textContent=`${d.getMonth()+1}月${d.getDate()}日 に投稿を作成`;}
+}
+function closeOv(){document.getElementById('ov').classList.remove('show');}
+document.getElementById('m_fmt').addEventListener('click',e=>{
+  const o=e.target.closest('.fmtopt');if(!o)return;
+  document.querySelectorAll('#m_fmt .fmtopt').forEach(x=>x.classList.toggle('on',x===o));
+  document.getElementById('storyHint').style.display=o.dataset.v==='ストーリー'?'block':'none';
+});
+function savePost(){
+  const theme=document.getElementById('m_theme').value.trim()||'（無題の投稿）';
+  const fmt=document.querySelector('#m_fmt .fmtopt.on').dataset.v;
+  const cap=document.getElementById('m_cap').value;
+  const when=document.getElementById('m_date').value+'T'+document.getElementById('m_time').value;
+  const id=Math.max(0,...store.posts.map(p=>p.id))+1;
+  const media=MEDIA.map(m=>({t:m.t,thumb:m.thumb,name:m.name,_url:m._url}));
+  store.posts.push({id,theme,fmt,cap,when,posted:false,ap:{i:false,c:false},mt:null,img:'',media});
+  save();closeOv();tab='approve';document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('on',x.dataset.t==='approve'));render();
+  toast('予約に追加。社内確認→クライアント確認の承認へ進みます');
+}
+/* ---- bulk schedule ---- */
+const BFMTS=['フィード','カルーセル','リール','ストーリー'];
+let BULK=[];
+function blankRow(){return {theme:'',fmt:'フィード',date:'',time:'19:00'};}
+function openBulk(){BULK=[blankRow(),blankRow(),blankRow()];renderBulkRows();document.getElementById('ovB').classList.add('show');}
+function closeOvB(){document.getElementById('ovB').classList.remove('show');}
+function addBulkRow(){syncBulk();BULK.push(blankRow());renderBulkRows();}
+function removeBulkRow(i){syncBulk();BULK.splice(i,1);if(!BULK.length)BULK.push(blankRow());renderBulkRows();}
+function syncBulk(){
+  document.querySelectorAll('#bulkRows .brow').forEach((row,i)=>{
+    if(!BULK[i])return;
+    BULK[i].theme=row.querySelector('.b-theme').value;
+    BULK[i].fmt=row.querySelector('.b-fmt').value;
+    BULK[i].date=row.querySelector('.b-date').value;
+    BULK[i].time=row.querySelector('.b-time').value;
+  });
+}
+function renderBulkRows(){
+  document.getElementById('bulkRows').innerHTML=BULK.map((r,i)=>`<div class="brow">
+    <input class="b-theme" placeholder="例）7月キャンペーン告知" value="${esc(r.theme)}">
+    <select class="b-fmt">${BFMTS.map(f=>`<option${f===r.fmt?' selected':''}>${f}</option>`).join('')}</select>
+    <input class="b-date" type="date" value="${r.date}">
+    <input class="b-time" type="time" value="${r.time}">
+    <button class="brm" onclick="removeBulkRow(${i})" title="この行を削除">✕</button>
+  </div>`).join('');
+}
+function autofillBulk(){
+  syncBulk();
+  const taken=new Set(store.posts.map(p=>p.when));
+  BULK.forEach(r=>{if(r.date)taken.add(r.date+'T'+(r.time||'19:00'));}); // 手入力済みの行は尊重・上書きしない
+  const empties=BULK.map((r,i)=>r.date?-1:i).filter(i=>i>=0);
+  if(!empties.length){toast('すべての行に日付が入っています');return;}
+  const byDay={};TOPSLOTS.forEach(t=>{(byDay[t.di]=byDay[t.di]||[]).push(BUCKETS[t.bi][1]);});
+  Object.values(byDay).forEach(a=>a.sort());
+  const d=new Date(TODAY+'T00:00');d.setDate(d.getDate()+1);
+  let k=0,guard=0;
+  while(k<empties.length&&guard<500){
+    const di=(d.getDay()+6)%7,times=byDay[di];
+    if(times){for(const tm of times){
+      const ds=`${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`,when=ds+'T'+tm;
+      if(taken.has(when))continue;
+      BULK[empties[k]].date=ds;BULK[empties[k]].time=tm;taken.add(when);k++;
+      if(k>=empties.length)break;
+    }}
+    d.setDate(d.getDate()+1);guard++;
+  }
+  renderBulkRows();
+  toast('空いている行に最適投稿時間を割り振りました');
+}
+function saveBulk(){
+  syncBulk();
+  const ready=BULK.filter(r=>r.date);
+  if(!ready.length){toast('日付のある行がありません。「おすすめ枠で日時を自動入力」も使えます');return;}
+  let id=Math.max(0,...store.posts.map(p=>p.id));
+  ready.forEach(r=>{id++;store.posts.push({id,theme:r.theme.trim()||'（無題の投稿）',fmt:r.fmt,cap:'',when:r.date+'T'+(r.time||'19:00'),posted:false,ap:{i:false,c:false},mt:null,img:'',media:[]});});
+  save();closeOvB();
+  tab='approve';document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('on',x.dataset.t==='approve'));render();
+  toast(`${ready.length}件をまとめて予約しました。社内確認→クライアント確認へ進みます`);
+}
+function openGrowth(){['g_foll','g_reach','g_views','g_nf','g_sends','g_save'].forEach(i=>document.getElementById(i).value='');document.getElementById('g_date').value=TODAY;document.getElementById('ovG').classList.add('show');}
+function closeOvG(){document.getElementById('ovG').classList.remove('show');}
+function saveGrowth(){
+  const v=id=>parseFloat(document.getElementById(id).value)||0,last=store.snaps[store.snaps.length-1];
+  store.snaps.push({d:document.getElementById('g_date').value||TODAY,foll:v('g_foll')||last.foll,reach:v('g_reach')||last.reach,views:v('g_views')||last.views,nf:v('g_nf')||last.nf,sends:v('g_sends')||last.sends,save:v('g_save')||last.save});
+  save();closeOvG();renderGrowth(document.getElementById('main'));toast('成長データを追加しました');
+}
+let tT;function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),1900);}
+document.getElementById('ov').addEventListener('click',e=>{if(e.target.id==='ov')closeOv();});
+document.getElementById('ovG').addEventListener('click',e=>{if(e.target.id==='ovG')closeOvG();});
+document.getElementById('ovD').addEventListener('click',e=>{if(e.target.id==='ovD')closeOvD();});
+document.getElementById('ovS').addEventListener('click',e=>{if(e.target.id==='ovS')closeOvS();});
+document.getElementById('ovB').addEventListener('click',e=>{if(e.target.id==='ovB')closeOvB();});
+render();
+if(/review/i.test(location.hash))openClientView(false);
+</script>
+</body>
+</html>
