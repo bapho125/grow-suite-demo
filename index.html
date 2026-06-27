@@ -138,6 +138,12 @@
   .qitem.cl,.qi.cl,.thumb.cl{cursor:pointer}
   .qitem.cl:hover .qt,.qi.cl:hover .qt{color:#5b2bbf}
   .qr{text-align:right;flex-shrink:0}.qr b{font-size:14px;font-weight:800}.qr span{font-size:10px;color:var(--muted);display:block}
+  .qfilt{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:11px}
+  .qf{border:1px solid var(--line);border-radius:9px;padding:7px 9px;font-size:12px;font-family:inherit;background:#fbfbfe;min-width:0;color:var(--text)}
+  .qf:focus{outline:none;border-color:#cdbdf2;background:#fff}
+  .qfkw{flex:1;min-width:88px}
+  .qfclr{border:none;background:#f4f5fa;color:var(--muted);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px;line-height:1;padding:0;flex-shrink:0}
+  .qfclr:hover{background:#eceef4;color:var(--text)}
   .qcount{font-size:11.5px;color:var(--muted);font-weight:700;margin-bottom:8px;padding:0 2px}
   .qscroll{max-height:480px;overflow-y:auto;padding-right:6px;margin-right:-3px}
   .qscroll::-webkit-scrollbar{width:7px}
@@ -458,6 +464,7 @@
 <script>
 const KEY='karakuri_suite_v3';
 let tab='cal', period='month', queueMode='up';
+let qFilter={month:'',fmt:'',kw:''};
 let calRef=new Date(2026,5,1); // June 2026 (demo)
 const TODAY='2026-06-27';
 const HDAYS=['月','火','水','木','金','土','日'];
@@ -564,6 +571,12 @@ function renderCal(m){
       </div>
       <div class="panel">
         <div class="seg" id="qseg" style="margin-bottom:13px"><button data-q="up" class="${queueMode==='up'?'on':''}">これから</button><button data-q="done" class="${queueMode==='done'?'on':''}">投稿済み</button></div>
+        <div class="qfilt">
+          <select class="qf" id="fMonth" onchange="setQF('month',this.value)">${monthOptions()}</select>
+          <select class="qf" id="fFmt" onchange="setQF('fmt',this.value)">${['','フィード','カルーセル','リール','ストーリー'].map(f=>`<option value="${f}"${qFilter.fmt===f?' selected':''}>${f||'全形式'}</option>`).join('')}</select>
+          <input class="qf qfkw" id="fKw" placeholder="テーマで検索" value="${esc(qFilter.kw)}" oninput="setQF('kw',this.value)">
+          <button class="qfclr" onclick="clearQF()" title="条件をクリア">×</button>
+        </div>
         <div class="qcount" id="qcount"></div>
         <div class="qscroll" id="queue"></div>
       </div>
@@ -583,29 +596,48 @@ function bestTimesPanel(){
     <div class="btrec">おすすめの投稿枠：${TOPSLOTS.map(t=>`<span class="btchip">${HDAYS[t.di]} ${BUCKETS[t.bi][1]}</span>`).join('')}<span style="color:var(--muted);font-size:11.5px">新規作成時にも提案されます</span></div>
   </div>`;
 }
+function monthOptions(){
+  const set=[...new Set(store.posts.map(p=>p.when.slice(0,7)))].sort().reverse();
+  return '<option value="">全期間</option>'+set.map(m=>{const a=m.split('-');return `<option value="${m}"${qFilter.month===m?' selected':''}>${a[0]}年${+a[1]}月</option>`;}).join('');
+}
+function setQF(k,v){qFilter[k]=v;renderQueue();}
+function clearQF(){
+  qFilter={month:'',fmt:'',kw:''};
+  const mo=document.getElementById('fMonth'),fm=document.getElementById('fFmt'),kw=document.getElementById('fKw');
+  if(mo)mo.value='';if(fm)fm.value='';if(kw)kw.value='';
+  renderQueue();
+}
+function matchQF(p){
+  return (!qFilter.month||p.when.slice(0,7)===qFilter.month)
+    &&(!qFilter.fmt||p.fmt===qFilter.fmt)
+    &&(!qFilter.kw||p.theme.toLowerCase().includes(qFilter.kw.trim().toLowerCase()));
+}
 function renderQueue(){
   const q=document.getElementById('queue');if(!q)return;
   const qc=document.getElementById('qcount');
+  const anyF=!!(qFilter.month||qFilter.fmt||qFilter.kw.trim());
   if(queueMode==='up'){
-    const up=store.posts.filter(p=>!p.posted).sort((a,b)=>a.when<b.when?-1:1);
-    if(qc)qc.textContent=up.length?`これから出る投稿 ${up.length}件`:'';
+    const base=store.posts.filter(p=>!p.posted);
+    const up=base.filter(matchQF).sort((a,b)=>a.when<b.when?-1:1);
+    if(qc)qc.textContent=base.length?(anyF?`該当 ${up.length}件 ／ 全${base.length}件`:`これから出る投稿 ${base.length}件`):'';
     q.innerHTML=up.length?up.map(p=>{const s=statusOf(p),dt=new Date(p.when),canPost=s.k==='sched';
       return `<div class="qitem">
         <div class="thumb cl" onclick="openDetail(${p.id})" style="background-image:url('${mediaThumb(p)}'),var(--ig2)">${mediaOverlay(p)}</div>
         <div class="qi cl" onclick="openDetail(${p.id})"><div class="qt">${esc(p.theme)}</div>
           <div class="qm"><span class="fmtb">${p.fmt}</span><span class="nw">${dt.getMonth()+1}/${dt.getDate()} ${('0'+dt.getHours()).slice(-2)}:${('0'+dt.getMinutes()).slice(-2)}</span><span class="chip ${s.k}">${s.t}</span></div></div>
         ${canPost?`<button class="btn ig sm" onclick="doPost(${p.id})">${p.fmt==='ストーリー'?'リマインド':'今すぐ投稿'}</button>`:''}
-      </div>`;}).join(''):`<div class="empty">予約中の投稿はありません</div>`;
+      </div>`;}).join(''):`<div class="empty">${base.length?'条件に合う投稿がありません':'予約中の投稿はありません'}</div>`;
   }else{
-    const done=store.posts.filter(p=>p.posted).sort((a,b)=>a.when<b.when?1:-1);
-    if(qc)qc.textContent=done.length?`投稿済み 全${done.length}件（新しい順）`:'';
+    const base=store.posts.filter(p=>p.posted);
+    const done=base.filter(matchQF).sort((a,b)=>a.when<b.when?1:-1);
+    if(qc)qc.textContent=base.length?(anyF?`該当 ${done.length}件 ／ 全${base.length}件`:`投稿済み 全${base.length}件（新しい順）`):'';
     q.innerHTML=done.length?done.map(p=>{const dt=new Date(p.when);
       return `<div class="qitem cl" onclick="openDetail(${p.id})">
         <div class="thumb" style="background-image:url('${mediaThumb(p)}'),var(--ig2)">${mediaOverlay(p)}</div>
         <div class="qi"><div class="qt">${esc(p.theme)}</div>
           <div class="qm"><span class="fmtb">${p.fmt}</span><span class="nw">${('0'+(dt.getMonth()+1)).slice(-2)}/${('0'+dt.getDate()).slice(-2)}</span><span class="chip posted">投稿済み</span></div></div>
         <div class="qr"><b>${p.mt?fmtNum(p.mt.reach):'–'}</b><span>リーチ</span></div>
-      </div>`;}).join(''):`<div class="empty">投稿済みはまだありません</div>`;
+      </div>`;}).join(''):`<div class="empty">${base.length?'条件に合う投稿がありません':'投稿済みはまだありません'}</div>`;
   }
 }
 function drawCal(){
