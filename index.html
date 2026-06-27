@@ -88,6 +88,15 @@
   .mvid{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;text-shadow:0 1px 4px rgba(0,0,0,.55)}
   .mcnt{position:absolute;top:3px;right:3px;background:rgba(20,20,30,.7);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:6px;z-index:2}
   .mthumbs{display:flex;flex-wrap:wrap;gap:9px;margin-top:11px}
+  .addmedia{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:11px;padding:13px;border:1.5px dashed #cdbdf2;border-radius:12px;background:#faf8ff;color:#5b2bbf;font-weight:700;font-size:13px;font-family:inherit;cursor:pointer;transition:.15s}
+  .addmedia:hover{background:#f3eeff;border-color:#a78bdb}
+  .rapbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 16px 7px;margin-top:18px;box-shadow:var(--sh2)}
+  .rapt-h{font-weight:800;font-size:14px;margin-bottom:4px}
+  .rapd{display:block;font-size:11.5px;color:var(--muted);line-height:1.5}
+  .rapt{display:flex;gap:9px;align-items:flex-start;padding:11px;border:1px solid var(--line);border-radius:11px;margin-bottom:9px;cursor:pointer;transition:.13s}
+  .rapt.on{border-color:#a78bdb;background:#faf8ff}
+  .rapt .rapr{color:#6228d7;font-size:13px;line-height:1.6;flex-shrink:0}
+  .rapt b{font-size:12.5px;font-weight:700;display:block;margin-bottom:2px}
   .mth{width:60px;height:60px;border-radius:10px;background-size:cover;background-position:center;position:relative;background-image:var(--ig2)}
   .mth .x{position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;background:#161b26;color:#fff;font-size:13px;line-height:1;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
   .dstrip{display:flex;gap:7px;margin:12px 0 2px;flex-wrap:wrap}
@@ -400,8 +409,8 @@
   <div class="f"><label>おすすめ投稿時間（タップで日時を設定）</label><div class="recslots" id="recSlots"></div></div>
   <div class="f"><label>写真・動画（カルーセルは最大10枚、リールは動画）</label>
     <input type="file" id="m_media" accept="image/*,video/*" multiple onchange="onPickMedia(event)" style="display:none">
-    <button type="button" class="btn ghost sm" onclick="document.getElementById('m_media').click()">＋ 写真・動画を追加</button>
     <div id="m_thumbs" class="mthumbs"></div>
+    <button type="button" class="addmedia" onclick="document.getElementById('m_media').click()">＋ 写真・動画を追加</button>
   </div>
   <div class="f"><label>キャプション</label><textarea id="m_cap" placeholder="本文・ハッシュタグ"></textarea></div>
   <div class="frow">
@@ -472,6 +481,7 @@ const BUCKETS=[['朝','08:00'],['昼','12:00'],['夕','19:00'],['夜','21:00']];
 const ACTIVITY=[[35,38,36,40,42,55,50],[62,65,60,68,70,72,68],[70,74,72,78,80,76,70],[82,85,80,88,90,86,78]];
 const TOPSLOTS=(()=>{const a=[];ACTIVITY.forEach((r,bi)=>r.forEach((v,di)=>a.push({bi,di,v})));a.sort((x,y)=>y.v-x.v);return a.slice(0,3);})();
 let store=load();
+if(!store.settings)store.settings={reapproval:'strict'};
 
 function load(){
   const raw=localStorage.getItem(KEY);
@@ -522,6 +532,7 @@ function load(){
       {d:'2026-06-22',foll:10450,reach:50200,views:93000,nf:61,sends:680,save:3.5},
     ],
     audience:{following:312,age:[['18-24',22],['25-34',41],['35-44',23],['45-54',9],['55+',5]],gender:{f:63,m:37}},
+    settings:{reapproval:'strict'},
   };
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify(store,(k,v)=>k==='_url'?undefined:v));}catch(e){toast('保存容量の上限です。画像・動画が多すぎる可能性があります');}}
@@ -737,7 +748,7 @@ function renderClientView(){
   let h=CLIENT_PREVIEW?`<div style="background:#161b26;color:#fff;border-radius:12px;padding:10px 14px;font-size:12px;text-align:center;margin-bottom:18px">運用者プレビュー — クライアントにはこの画面だけが表示されます</div>`:'';
   h+=`<div class="cvhead"><div class="cvlogo">G</div><h2>投稿内容のご確認</h2>
     <p>@your_brand の運用担当より。下記の投稿をご確認ください。<br>問題なければ「承認」、ご要望があれば「修正を依頼」を押してください。</p></div>`;
-  if(!pend.length){body.innerHTML=h+`<div class="cdone"><div class="big">🎉</div>確認をお願いする投稿はありません。<br>ありがとうございます。</div>`;return;}
+  if(!pend.length){body.innerHTML=h+`<div class="cdone"><div class="big">🎉</div>確認をお願いする投稿はありません。<br>ありがとうございます。</div>`+reapprovalBox();return;}
   h+=`<div style="text-align:center"><span class="cvcount">確認待ち ${pend.length}件</span></div>`;
   h+=pend.map(p=>{const dt=new Date(p.when),media=detailMedia(p),m0=media[0];
     return `<div class="ccard">
@@ -756,9 +767,22 @@ function renderClientView(){
           <div class="row"><button class="btn ghost sm" onclick="toggleFix(${p.id})">キャンセル</button><button class="btn ig sm" onclick="clientFix(${p.id})">依頼を送信</button></div>
         </div>
       </div></div>`;}).join('');
+  h+=reapprovalBox();
   h+=`<div style="text-align:center;font-size:11px;color:var(--muted);margin-top:10px">提供：@your_brand 運用チーム ／ GROW Suite</div>`;
   body.innerHTML=h;
 }
+function reapprovalBox(){
+  const pol=(store.settings&&store.settings.reapproval)||'strict';
+  const opt=(v,t,d)=>`<label class="rapt${pol===v?' on':''}" onclick="setReapproval('${v}')"><span class="rapr">${pol===v?'●':'○'}</span><span><b>${t}</b><span class="rapd">${d}</span></span></label>`;
+  return `<div class="rapbox">
+    <div class="rapt-h">⚙ 編集時の再確認ルール</div>
+    <div class="rapd" style="margin-bottom:11px">承認後に運用側が投稿を編集した時、もう一度あなたの確認を求めるかを選べます。</div>
+    ${opt('strict','写真・本文・形式を変えたら再確認（おすすめ）','内容が少しでも変わったら、承認を一旦リセットして再確認します。')}
+    ${opt('mid','写真・本文を変えた時だけ再確認','形式や日時の微調整はお任せ。写真・文章の変更だけ再確認します。')}
+    ${opt('keep','編集されても承認は維持','細かい修正はお任せ。編集後も承認はそのままにします。')}
+  </div>`;
+}
+function setReapproval(mode){if(!store.settings)store.settings={};store.settings.reapproval=mode;save();renderClientView();toast('再確認ルールを保存しました');}
 function clientApprove(id){const p=store.posts.find(x=>x.id===id);if(!p)return;p.ap.c=true;p.needsFix=false;save();renderClientView();render();toast('承認いただきありがとうございます');}
 function toggleFix(id){const el=document.getElementById('fix-'+id);if(el)el.style.display=el.style.display==='block'?'none':'block';}
 function clientFix(id){const p=store.posts.find(x=>x.id===id);if(!p)return;p.note=document.getElementById('fixt-'+id).value.trim()||'修正希望';p.needsFix=true;save();renderClientView();render();toast('修正依頼を送信しました');}
@@ -1106,7 +1130,7 @@ function openPost(anchor,post){
   document.getElementById('storyHint').style.display=curFmt==='ストーリー'?'block':'none';
   document.getElementById('m_when').textContent='';
   document.getElementById('recSlots').innerHTML=TOPSLOTS.map(t=>`<span class="btchip" style="cursor:pointer" onclick="applySlot(${t.di},'${BUCKETS[t.bi][1]}')">${HDAYS[t.di]} ${BUCKETS[t.bi][1]}</span>`).join('');
-  MEDIA=post&&post.media?post.media.map(m=>({t:m.t,thumb:m.thumb,name:m.name,_url:m._url})):[];renderMediaThumbs();
+  MEDIA=post?detailMedia(post).map(m=>({t:m.t,thumb:m.thumb,name:m.name,_url:m._url})):[];renderMediaThumbs();
   const ov=document.getElementById('ov'),modal=ov.querySelector('.modal');
   if(anchor){
     ov.classList.add('anchored');
@@ -1144,9 +1168,18 @@ function savePost(){
   const media=MEDIA.map(m=>({t:m.t,thumb:m.thumb,name:m.name,_url:m._url}));
   if(editId!=null){
     const p=store.posts.find(x=>x.id===editId);
-    if(p){p.theme=theme;p.fmt=fmt;p.cap=cap;p.when=when;p.media=media;}
+    let reset=false;
+    if(p){
+      const oldMedia=detailMedia(p).map(m=>m.thumb).join('|');
+      const capCh=p.cap!==cap, fmtCh=p.fmt!==fmt, mediaCh=oldMedia!==media.map(m=>m.thumb).join('|');
+      const pol=(store.settings&&store.settings.reapproval)||'strict';
+      if(pol==='strict')reset=capCh||fmtCh||mediaCh;
+      else if(pol==='mid')reset=capCh||mediaCh; // 'keep' → リセットしない
+      p.theme=theme;p.fmt=fmt;p.cap=cap;p.when=when;p.media=media;p.img='';
+      if(reset&&p.ap.c){p.ap.c=false;p.needsFix=false;}
+    }
     editId=null;save();closeOv();render();
-    toast('投稿を更新しました');
+    toast(reset?'投稿を更新しました（内容変更によりクライアント確認をリセット）':'投稿を更新しました');
     return;
   }
   const id=Math.max(0,...store.posts.map(p=>p.id))+1;
