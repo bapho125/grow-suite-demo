@@ -138,6 +138,12 @@
   .qitem.cl,.qi.cl,.thumb.cl{cursor:pointer}
   .qitem.cl:hover .qt,.qi.cl:hover .qt{color:#5b2bbf}
   .qr{text-align:right;flex-shrink:0}.qr b{font-size:14px;font-weight:800}.qr span{font-size:10px;color:var(--muted);display:block}
+  .qcount{font-size:11.5px;color:var(--muted);font-weight:700;margin-bottom:8px;padding:0 2px}
+  .qscroll{max-height:480px;overflow-y:auto;padding-right:6px;margin-right:-3px}
+  .qscroll::-webkit-scrollbar{width:7px}
+  .qscroll::-webkit-scrollbar-thumb{background:#d7dae8;border-radius:6px}
+  .qscroll::-webkit-scrollbar-thumb:hover{background:#c2c6d8}
+  .qscroll::-webkit-scrollbar-track{background:transparent}
   /* === GROWTH === */
   .hero{background:var(--card);border-radius:22px;box-shadow:var(--sh);padding:24px;display:grid;grid-template-columns:310px 1fr;gap:24px;margin-bottom:16px;opacity:0;transform:translateY(14px);animation:rise .6s .05s forwards}
   .herol{display:flex;align-items:center;gap:18px}
@@ -349,6 +355,7 @@
     .cell{min-height:62px;padding:4px}
     .ev .evth{display:none}
     .ev{padding:3px 5px}
+    .qscroll{max-height:62vh}
   }
 </style>
 </head>
@@ -557,7 +564,8 @@ function renderCal(m){
       </div>
       <div class="panel">
         <div class="seg" id="qseg" style="margin-bottom:13px"><button data-q="up" class="${queueMode==='up'?'on':''}">これから</button><button data-q="done" class="${queueMode==='done'?'on':''}">投稿済み</button></div>
-        <div id="queue"></div>
+        <div class="qcount" id="qcount"></div>
+        <div class="qscroll" id="queue"></div>
       </div>
     </div>
     ${bestTimesPanel()}
@@ -577,8 +585,10 @@ function bestTimesPanel(){
 }
 function renderQueue(){
   const q=document.getElementById('queue');if(!q)return;
+  const qc=document.getElementById('qcount');
   if(queueMode==='up'){
     const up=store.posts.filter(p=>!p.posted).sort((a,b)=>a.when<b.when?-1:1);
+    if(qc)qc.textContent=up.length?`これから出る投稿 ${up.length}件`:'';
     q.innerHTML=up.length?up.map(p=>{const s=statusOf(p),dt=new Date(p.when),canPost=s.k==='sched';
       return `<div class="qitem">
         <div class="thumb cl" onclick="openDetail(${p.id})" style="background-image:url('${mediaThumb(p)}'),var(--ig2)">${mediaOverlay(p)}</div>
@@ -588,6 +598,7 @@ function renderQueue(){
       </div>`;}).join(''):`<div class="empty">予約中の投稿はありません</div>`;
   }else{
     const done=store.posts.filter(p=>p.posted).sort((a,b)=>a.when<b.when?1:-1);
+    if(qc)qc.textContent=done.length?`投稿済み 全${done.length}件（新しい順）`:'';
     q.innerHTML=done.length?done.map(p=>{const dt=new Date(p.when);
       return `<div class="qitem cl" onclick="openDetail(${p.id})">
         <div class="thumb" style="background-image:url('${mediaThumb(p)}'),var(--ig2)">${mediaOverlay(p)}</div>
