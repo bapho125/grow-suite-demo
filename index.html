@@ -386,7 +386,7 @@
       <button data-t="about"><span class="ico">ℹ️</span>このツールについて</button>
     </nav>
     <div class="acc"><b>@your_brand</b><span style="color:var(--muted)">フォロワー <span id="sideFoll">–</span></span></div>
-    <div class="demo">※デモ版：実際のIG投稿は行わず動作をシミュレートします。</div>
+    <div class="demo"><b style="color:#5b2bbf">これはデモ（サンプル）です。</b>表示データはすべて架空で、実際のIG投稿・API連携は行いません。御社専用に作る前提のサンプルです。</div>
   </aside>
 
   <main class="main" id="main"></main>
@@ -1048,6 +1048,10 @@ function renderAbout(m){
       <p class="alead">「投稿を管理する」だけのツールではありません。Instagramで実際に結果を出すために、運用者が押さえるべき原則を、そのまま設計に落とし込んでいます。</p>
     </div>
     <section class="abs">
+      <div class="abk">これは何ですか</div>
+      <p style="font-size:13.5px;color:#39404f;line-height:1.95;margin:10px 0 0">Karakuriがつくった、Instagram運用代行向けの業務管理ツールの<b>サンプル</b>です。表示データは架空で、実際の投稿やAPI連携は行いません。「こういうものが作れます」を、実際に触って確かめてもらうためのデモです。投稿の確認・承認をLINEのやり取りで回しているチームの、<b>承認の記録が残らない・修正のやり取りが流れる・月次報告を別で作り直す</b>という手間を整理するために設計しました。</p>
+    </section>
+    <section class="abs">
       <div class="abk">設計の考え方</div>
       <ol class="prin">
         <li><span class="no">01</span><div><b>抜け漏れは、仕組みで防ぐ</b><p>誰が運用しても作り忘れ・投稿忘れが残らないよう、カレンダーと二段階の承認で押さえます。属人化させません。</p></div></li>
@@ -1074,6 +1078,14 @@ function renderAbout(m){
         <div class="srow"><dt>はじめの連携</dt><dd>初回に一度、接続を許可いただくだけで完了します。</dd></div>
       </dl>
       <p class="abfoot">本デモは動作のシミュレーションです。実際のInstagramへの投稿は行いません。本番導入では、上記の前提のもとで自動投稿を実装します（運用ガイドは別途お渡しします）。</p>
+    </section>
+    <section class="abs">
+      <div class="abk">御社向けに作ります</div>
+      <p style="font-size:13.5px;color:#39404f;line-height:1.95;margin:10px 0 0">これはSaaS（既製の月額サービス）ではありません。このデモを見て「こういう仕組みが欲しい」と思ったら、<b>御社の運用フローに合わせてゼロから開発</b>します。いきなり全部でなくても、「クライアント承認だけ」のような小さな範囲から始められます。現在、初期導入の<b>モニターパートナーを募集中</b>です。通常より大きく抑えた価格でお受けする代わりに、使った感想を正直にいただければと思っています。</p>
+    </section>
+    <section class="abs">
+      <div class="abk">Karakuriについて</div>
+      <p style="font-size:13.5px;color:#39404f;line-height:1.95;margin:10px 0 0">AIを活用した受託開発の会社です。LINE bot・GAS自動化・業務ツール開発が主な領域。代表はSNSコンサル出身で、<b>現場の業務フローを理解した上でツールを設計する</b>ことを大切にしています。アイデアだけでなく、まず動くものを見せるのがやり方です。</p>
     </section>
   </div>`;
 }
