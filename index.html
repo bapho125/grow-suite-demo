@@ -1091,14 +1091,14 @@ function mediaOverlay(p){
 }
 function downscale(dataURL,cb){
   const im=new Image();
-  im.onload=()=>{const mx=1000,sc=Math.min(1,mx/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',0.82));};
+  im.onload=()=>{const mx=720,sc=Math.min(1,mx/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',0.7));};
   im.onerror=()=>cb(dataURL);im.src=dataURL;
 }
 function capturePoster(url,cb){
   const v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='metadata';let done=false;
   const fin=d=>{if(done)return;done=true;cb(d);};
   v.onloadeddata=()=>{try{v.currentTime=Math.min(0.1,(v.duration||1)*0.1);}catch(e){fin(null);}};
-  v.onseeked=()=>{try{const sc=Math.min(1,1000/Math.max(v.videoWidth||640,v.videoHeight||640));const c=document.createElement('canvas');c.width=Math.round((v.videoWidth||640)*sc);c.height=Math.round((v.videoHeight||640)*sc);c.getContext('2d').drawImage(v,0,0,c.width,c.height);fin(c.toDataURL('image/jpeg',0.8));}catch(e){fin(null);}};
+  v.onseeked=()=>{try{const sc=Math.min(1,720/Math.max(v.videoWidth||640,v.videoHeight||640));const c=document.createElement('canvas');c.width=Math.round((v.videoWidth||640)*sc);c.height=Math.round((v.videoHeight||640)*sc);c.getContext('2d').drawImage(v,0,0,c.width,c.height);fin(c.toDataURL('image/jpeg',0.7));}catch(e){fin(null);}};
   v.onerror=()=>fin(null);setTimeout(()=>fin(null),4000);v.src=url;
 }
 function onPickMedia(e){
